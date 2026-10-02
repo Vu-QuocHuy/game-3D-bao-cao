@@ -1,0 +1,156 @@
+{
+  "startFrame": 1,
+  "endFrame": 97,
+  "checks": [
+    {
+      "name": "Scene launches in its configured topic",
+      "passed": true,
+      "detail": "T5=False"
+    },
+    {
+      "name": "Spawn grounded",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Default state Idle",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Two valid Humanoid Avatars",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Humanoid controller shared across proportions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Humanoid muscle animation moves joints",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "W moves forward relative to camera",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Walking speed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Sprint speed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Sprint displacement",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Jump enters airborne",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Fall after apex",
+      "passed": true,
+      "detail": "transitions=Run \u2192 Idle | Idle \u2192 Jump | Jump \u2192 Fall | Fall \u2192 Land | Land \u2192 Idle"
+    },
+    {
+      "name": "Crouch changes capsule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Jump blocked while crouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Ceiling blocks standing",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Can stand after leaving beam",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Animation event hitbox damages dummy once",
+      "passed": true,
+      "detail": "HP=75 started=True opened=False targetHits=1"
+    },
+    {
+      "name": "Attack ends",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Attack blocked in air",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Trap causes Hit",
+      "passed": true,
+      "detail": "HP=75 priority=Hit"
+    },
+    {
+      "name": "Repeated damage leads to Dead",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Dead blocks movement and attack",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Reset restores all player state",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera mode 0",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera mode 1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera mode 2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Fixed camera zone override",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera mode remembered after zone",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Stairs reach upper platform",
+      "passed": true,
+      "detail": "maxY=3.04 final=(0.00, 0.03, 15.09)"
+    },
+    {
+      "name": "Camera line to player stays unobstructed",
+      "passed": true,
+      "detail": "camera=(-10.00, 1.85, 15.50)"
+    }
+  ]
+}
