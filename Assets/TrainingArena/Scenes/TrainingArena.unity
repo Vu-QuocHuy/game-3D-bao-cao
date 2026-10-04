@@ -1919,7 +1919,7 @@ MonoBehaviour:
     m_Value: 0
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 0
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1516895290}
@@ -2258,10 +2258,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.08
-  far clip plane: 120
+  far clip plane: 5000
   field of view: 60
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -2660,6 +2660,7 @@ GameObject:
   - component: {fileID: 460765513}
   - component: {fileID: 460765511}
   - component: {fileID: 460765508}
+  - component: {fileID: 460765516}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -2796,9 +2797,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdfa759a60434eb91b812feafc52c0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainingArena.PlayerBrain
-  allowMovingAttack: 1
-  topic5: 1
   spawn: {fileID: 250287649}
+  topic5: 1
 --- !u!114 &460765514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2837,6 +2837,34 @@ CharacterController:
   m_SkinWidth: 0.035
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!95 &460765516
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460765507}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: a486fa7c6a72a8f91950552e4383be3f, type: 2}
+  m_Controller: {fileID: 9100000, guid: 6b7cf23309451f895a019ad523d175fa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'Hips'\n\tTransform 'Hips'\n\tFrom animation
+    clip 'Idle'\n\tFrom animation clip 'Walk'\n\tFrom animation clip 'Run'\n\tFrom
+    animation clip 'Jump'\n\tFrom animation clip 'Fall'\n\tFrom animation clip 'Land'\n\tFrom
+    animation clip 'Crouch'\n\tFrom animation clip 'Hit'\n\tFrom animation clip 'Dead'\n\tFrom
+    animation clip 'Attack'\n\tand more ..."
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &466458274
 GameObject:
   m_ObjectHideFlags: 0
@@ -4128,7 +4156,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4294634971
   m_fontColor: {r: 0.86, g: 0.93, b: 0.98, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -4141,7 +4169,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -4278,7 +4306,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -4699,7 +4727,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -4858,6 +4886,7 @@ MonoBehaviour:
   history: {fileID: 631465066}
   help: {fileID: 628595408}
   healthFill: {fileID: 2105897451}
+  showHUD: 1
 --- !u!114 &720293107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4916,7 +4945,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -5087,6 +5116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrainingArena.DemoController
   player: {fileID: 460765513}
   cameraCoordinator: {fileID: 1441566379}
+  overlay: {fileID: 0}
   topic5: 1
 --- !u!4 &752157528
 Transform:
@@ -5929,7 +5959,7 @@ MonoBehaviour:
     m_Value: 0
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 0
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1516895290}
@@ -7950,6 +7980,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1137613263}
   - component: {fileID: 1137613262}
+  - component: {fileID: 1137613264}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -8037,6 +8068,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1137613264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137613261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1147881347
 GameObject:
   m_ObjectHideFlags: 0
@@ -10008,8 +10068,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrainingArena.CameraCoordinator
   player: {fileID: 460765510}
   targetPivot: {fileID: 1516895290}
-  input: {fileID: 460765509}
   fixedAnchor: {fileID: 1284180626}
+  input: {fileID: 460765509}
   tps: {fileID: 1676532308}
   fps: {fileID: 2007407030}
   topDown: {fileID: 324246318}
@@ -11000,7 +11060,7 @@ MonoBehaviour:
     m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 0
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1516895290}
@@ -12987,7 +13047,7 @@ MonoBehaviour:
     m_Value: 0
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 0
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1516895290}
@@ -13202,7 +13262,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2

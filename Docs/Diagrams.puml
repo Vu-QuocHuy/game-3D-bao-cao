@@ -1,0 +1,67 @@
+@startuml T3_Architecture
+!theme plain
+skinparam componentStyle rectangle
+
+title Sơ đồ T3 - Kiến trúc Di chuyển & Camera
+
+package "Input & Camera" {
+  [PlayerInputHandler] as Input
+  [CameraCoordinator] as Camera
+}
+
+package "Movement & Logic" {
+  [PlayerBrain] as Brain
+  [PlayerMotor] as Motor
+}
+
+[CharacterController] as CC
+
+Input --> Brain : Move (Vector2),\nJump, Sprint (bool)
+Camera ..> Motor : Cung cấp hướng ngang\n(Camera.forward)
+Brain --> Motor : Step(input, canMove, canJump)
+Motor --> CC : Move(velocity * Time.deltaTime)
+
+note right of Motor
+  * Tính hướng di chuyển tương đối với Camera
+  * Kiểm tra Grounded (cc.isGrounded)
+  * Áp dụng trọng lực (Vertical Velocity)
+end note
+@enduml
+
+@startuml T5_FSM_States
+!theme plain
+hide empty description
+
+title Sơ đồ T5 - FSM 4 Trạng thái (Lifecycle & Mapping)
+
+[*] --> Grounded : Khởi tạo / Reset
+
+state Grounded {
+  note "Animator: Blend Tree (Speed)\nNhận input: Đi, Chạy, Nhảy" as N1
+}
+
+state Airborne {
+  note "Animator: Fall/Jump (VerticalSpeed)\nKhóa nhảy, giữ giới hạn vận tốc" as N2
+}
+
+state Hit {
+  note "Animator: Hit (Mode=2)\nKhóa điều khiển tạm thời (0.7s)" as N3
+}
+
+state Dead {
+  note "Animator: Death (Mode=3)\nKhóa vĩnh viễn gameplay input" as N4
+}
+
+Grounded --> Airborne : Nhảy (Space) / Rơi khỏi bục
+Airborne --> Grounded : Chạm đất (Grounded = true)
+
+Grounded --> Hit : Nhận sát thương (H) \n& HP còn > 0
+Hit --> Grounded : Hết thời gian choáng (0.7s)
+Hit --> Airborne : Rơi khỏi bục lúc đang bị Hit
+
+Grounded --> Dead : Sát thương chí mạng (K hoặc HP = 0)
+Airborne --> Dead : Sát thương chí mạng (K)
+Hit --> Dead : Sát thương chí mạng (K)
+
+Dead --> Grounded : Nhấn Reset (R)
+@enduml
