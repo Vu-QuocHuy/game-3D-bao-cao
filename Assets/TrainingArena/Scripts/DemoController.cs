@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 namespace TrainingArena {
+// Runs before PlayerBrain so H/K resolve before Jump in the same frame (Hit/Dead win).
+[DefaultExecutionOrder(-15)]
 public sealed class DemoController : MonoBehaviour {
     public PlayerBrain player;
     public CameraCoordinator cameraCoordinator;
@@ -8,6 +10,7 @@ public sealed class DemoController : MonoBehaviour {
     public bool topic5 = true;
     
     void Start() {
+        if (!overlay) overlay = FindAnyObjectByType<DebugOverlay>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         Application.targetFrameRate = 60;
@@ -17,10 +20,10 @@ public sealed class DemoController : MonoBehaviour {
         var k = Keyboard.current;
         if (k == null) return;
         
+        // Spec: Esc frees the cursor to switch windows; a click locks it again (in LateUpdate, so that click is not an attack).
         if (k.escapeKey.wasPressedThisFrame) {
-            bool locked = Cursor.lockState == CursorLockMode.Locked;
-            Cursor.lockState = locked ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = locked;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         
         if (k.rKey.wasPressedThisFrame || player.transform.position.y < -10) {
@@ -40,11 +43,19 @@ public sealed class DemoController : MonoBehaviour {
         }
     }
     
+    void LateUpdate() {
+        if (Cursor.lockState != CursorLockMode.Locked && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
     public void ResetDemo() {
         player.ResetPlayer();
         cameraCoordinator.ResetCamera();
         player.GetComponentInChildren<PlayerAnimator>()?.ResetAnimation();
         foreach (var zone in FindObjectsByType<DamageZone>(FindObjectsSortMode.None)) zone.Clear();
+        foreach (var h in FindObjectsByType<Health>(FindObjectsSortMode.None)) if (h.gameObject != player.gameObject) h.Restore(); // training dummy
     }
     
     void OnApplicationFocus(bool focus) {
