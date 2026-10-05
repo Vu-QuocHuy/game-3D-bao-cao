@@ -1,16 +1,14 @@
-# Hợp đồng cấu hình
+# Cấu hình thực tế
 
-- Editor: 6000.3.23f1, URP. Input System 1.20, Cinemachine 3.1.7.
-- Layer 0: môi trường; layer 8: Player và visual. Ground check, trần và Deoccluder chỉ dùng layer 0, bỏ qua trigger.
-- Input Actions (`Input/PlayerControls.inputactions`): Move, Look, Jump, Sprint, Crouch. H/K/R/F1/C/Esc đọc trực tiếp từ bàn phím trong `DemoController`/`CameraCoordinator`.
-- Motor (`Config/PlayerConfig.asset`): Walk 3 m/s, Run 6 m/s, Crouch 1,6 m/s, Jump 1,8 m, gravity −22 m/s². Capsule đứng 1,8 m, khom 1,05 m. Step offset 0,45 m khi đứng, 0,1 m khi khom.
-- FSM: Grounded=0, Airborne=1, Hit=2, Dead=3. HP 100, H −25 (chỉ Grounded), Hit 0,7 s, K → HP 0. Ưu tiên Dead > Hit > Jump trong cùng frame.
-- Animator `Player.controller`, Root Motion tắt:
-  - Parameter: `Mode` (int), `Speed` (float, m/s thực tế), `VerticalSpeed` (float), `Crouch` (bool), `Attack` (trigger).
-  - Locomotion: Blend Tree 1D Idle 0 / Walk 3 / Run 6. Crouch: Blend Tree Crouch 0 / CrouchWalk 1,6.
-  - Any State → Dead (`Mode==3`), Any State → Hit (`Mode==2`), không tự chuyển lại chính nó.
-  - Locomotion/Crouch/Land → Jump (`Mode==1`, VerticalSpeed > 0,1) hoặc Fall (VerticalSpeed < 0,1); Jump → Fall; Jump/Fall → Land (`Mode==0`) → Locomotion.
-  - Hit → Locomotion (`Mode==0`) hoặc Fall (`Mode==1`); Hit/Dead tắt loop.
-  - Layer `Upper Body Action` (Avatar Mask Hips/UpperBody, weight 1, Override): Empty → Attack (trigger), Attack → Empty theo exit time 0,95 hoặc khi `Mode > 1`.
-- Attack: Event OpenHitbox 0,16 s, CloseHitbox 0,65 s; thời lượng 0,85 s, cooldown 1 s, damage 25, tầm 1,1 m bán kính 0,6 m; chỉ Grounded. Dummy 100 HP, R hồi đầy.
-- Camera: CM TPS (priority 20 khi chọn) và CM Top Down làm góc rộng (priority 20 khi chọn), Brain blend EaseInOut 0,65 s, Deoccluder trên TPS. Pitch −30°..70°.
+| Mục | Giá trị |
+|---|---|
+| Unity | 6000.3.23f1, URP; Input System 1.20 (Active Input Handling: New); Cinemachine 3.1.7; TextMeshPro |
+| Layer | 6 Environment (sàn, bậc, dốc, tường, thanh chắn); 8 Player |
+| Character Controller | Height 1,8; Radius 0,3; Center (0, 0,9, 0); Step Offset 0,3 (0,1 khi khom); Slope Limit 45; Skin Width 0,08 |
+| PlayerController | run 5, walk 2, crouch 1,6 m/s; gravity −20; jumpHeight 1,2 m; xoay 720°/s; chạm đất giữ VelocityY −2 |
+| Input Actions `Input/PlayerControls` | Move (WASD, Left Stick), Look (Mouse Delta, Right Stick), Jump (Space, Button South), Walk (Left Ctrl), ToggleWorldMove (T), Crouch (C), Attack (Left Mouse) |
+| UI cảm ứng | On-Screen Stick `<Gamepad>/leftStick` (góc dưới trái), On-Screen Button `<Gamepad>/buttonSouth` (góc dưới phải), vùng kéo On-Screen Stick `<Gamepad>/rightStick` (nửa phải), EventSystem + Input System UI Input Module |
+| Camera | CinemachineCamera, Tracking Target `Player/CameraTarget` (y 1,5; 0,95 khi khom); Orbital Follow Sphere, bán kính 4 m, damping 0,2; Rotation Composer damping 0,1; Deoccluder chỉ va layer Environment, Camera Radius 0,2, bỏ qua tag Player; pitch −20°..70° |
+| Animator | Parameter `Speed` (0–1), `IsGrounded`, `Jump` (trigger); mở rộng `Crouch`, `Attack` (trigger). Locomotion → Jump (Jump), Jump → Fall (exit time 0,7), Locomotion → Fall (!IsGrounded), Fall → Locomotion (IsGrounded); Locomotion ↔ Crouch (Crouch). Layer Upper Body (mask thân trên) cho Attack, weight tăng khi đang đánh. Root Motion tắt |
+| Clip | Idle, Walk, Run, Fall, Crouch, CrouchWalk loop; Jump, Attack không loop. Event: Footstep (Walk/Run), OpenHitbox 0,16 s / CloseHitbox 0,65 s (Attack) |
+| Attack | 0,85 s, cooldown 1 s, −25 HP, tầm 1,1 m; dummy 100 HP, R hồi đầy |
