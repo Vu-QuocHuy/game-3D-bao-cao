@@ -1,67 +1,152 @@
-@startuml T3_Architecture
+@startuml ThuBa_Architecture
 !theme plain
 skinparam componentStyle rectangle
 
-title Sơ đồ T3 - Kiến trúc Di chuyển & Camera
+title Thứ Ba - Kiến trúc điều khiển nhân vật và camera
 
-package "Input & Camera" {
-  [PlayerInputHandler] as Input
-  [CameraCoordinator] as Camera
+package "Player" {
+  [Player Input\n(PlayerControls.inputactions)] as Input
+  [PlayerController] as Controller
+  [CharacterController\nStep Offset 0.3 · Slope Limit 45] as CC
+  [CameraTarget\n(y = 1.5)] as Target
 }
 
-package "Movement & Logic" {
-  [PlayerBrain] as Brain
-  [PlayerMotor] as Motor
+package "Canvas (cảm ứng)" {
+  [On-Screen Stick\n<Gamepad>/leftStick] as Stick
+  [On-Screen Button\n<Gamepad>/buttonSouth] as JumpBtn
+  [Vùng kéo On-Screen Stick\n<Gamepad>/rightStick] as LookArea
 }
 
-[CharacterController] as CC
+package "Camera" {
+  [Main Camera\nCinemachine Brain] as Brain
+  [CinemachineCamera\nOrbital Follow 4 m] as VCam
+  [CameraOrbitInput] as OrbitInput
+  [Cinemachine Deoccluder\nlayer Environment, radius 0.2] as Deocc
+}
 
-Input --> Brain : Move (Vector2),\nJump, Sprint (bool)
-Camera ..> Motor : Cung cấp hướng ngang\n(Camera.forward)
-Brain --> Motor : Step(input, canMove, canJump)
-Motor --> CC : Move(velocity * Time.deltaTime)
+Stick ..> Input : Move
+JumpBtn ..> Input : Jump
+LookArea ..> Input : Look
+Input --> Controller : Move, Jump, Walk,\nToggleWorldMove (T)
+Input --> OrbitInput : Look
+OrbitInput --> VCam : xoay trục ngang / dọc
+VCam --> Target : Tracking Target
+VCam --> Deocc
+Brain --> VCam : chọn camera đang live
+Brain ..> Controller : forward / right của camera\n(bỏ y, chuẩn hoá)
+Controller --> CC : Move((dir * speed + up * velocityY) * dt)\nđúng 1 lần mỗi khung hình
 
-note right of Motor
-  * Tính hướng di chuyển tương đối với Camera
-  * Kiểm tra Grounded (cc.isGrounded)
-  * Áp dụng trọng lực (Vertical Velocity)
+note right of Controller
+  * dir = f * input.y + r * input.x
+  * T: theo camera <-> theo trục thế giới
+  * speed: chạy 5 m/s, giữ Ctrl đi 2 m/s
+  * gravity -20; chạm đất giữ velocityY = -2
+  * Nhảy chỉ khi isGrounded: v = sqrt(1.2 * -2 * gravity)
+  * Xoay về hướng đi 720°/s
+  * Công bố: InputMagnitude, HorizontalSpeed,
+    VelocityY, IsGrounded, JumpPressed
 end note
 @enduml
 
-@startuml T5_FSM_States
+@startuml ThuNam_FSM_States
 !theme plain
 hide empty description
 
-title Sơ đồ T5 - FSM 4 Trạng thái (Lifecycle & Mapping)
+title Thứ Năm - State Machine (IState: Enter / Tick / Exit)
 
-[*] --> Grounded : Khởi tạo / Reset
+[*] --> Idle : Khởi tạo / R
 
-state Grounded {
-  note "Animator: Blend Tree (Speed)\nNhận input: Đi, Chạy, Nhảy" as N1
+state Idle : Enter: SetFloat("Speed", 0)
+state Move : Speed do AnimatorBridge cập nhật
+state Jump : Enter: SetTrigger("Jump")
+state Fall : Enter: SetBool("IsGrounded", false)
+
+Idle --> Move : có đầu vào
+Move --> Idle : hết đầu vào
+Idle --> Jump : nhấn nhảy khi chạm đất
+Move --> Jump : nhấn nhảy khi chạm đất
+Idle --> Fall : !IsGrounded
+Move --> Fall : !IsGrounded
+Jump --> Fall : VelocityY <= 0
+Fall --> Idle : IsGrounded, không có đầu vào
+Fall --> Move : IsGrounded, còn đầu vào
+
+state "Mở rộng (không sửa 4 state gốc)" as Ext {
+  state Crouch : giữ C · 1.6 m/s · cấm nhảy\nkhông đứng dậy khi có trần
+  state Attack : chuột trái · Enter: SetTrigger("Attack")\nhitbox do Animation Event
 }
 
-state Airborne {
-  note "Animator: Fall/Jump (VerticalSpeed)\nKhóa nhảy, giữ giới hạn vận tốc" as N2
+Idle --> Crouch : Crouched
+Move --> Crouch : Crouched
+Crouch --> Idle : hết khom, không đầu vào
+Crouch --> Move : hết khom, còn đầu vào
+Crouch --> Fall : !IsGrounded
+Idle --> Attack : bắt đầu đòn đánh
+Move --> Attack : bắt đầu đòn đánh
+Crouch --> Attack : bắt đầu đòn đánh
+Attack --> Idle : đòn kết thúc
+Attack --> Move : đòn kết thúc, còn đầu vào
+Attack --> Jump : nhảy
+Attack --> Fall : !IsGrounded
+
+note bottom of Ext
+  PlayerStateMachine áp luật chuyển chung trước khi gọi Tick(),
+  nên thêm state mới không phải sửa Idle/Move/Jump/Fall.
+end note
+@enduml
+
+@startuml ThuNam_Update_Order
+!theme plain
+
+title Thứ Năm - Thứ tự cập nhật mỗi khung hình (Script Execution Order)
+
+participant "PlayerController\n(order 0)" as PC
+participant "PlayerStateMachine\n(order 10)" as SM
+participant "AnimatorBridge\n(order 20)" as AB
+participant "Animator" as AN
+participant "DebugHUD\n(order 30)" as HUD
+
+PC -> PC : đọc Input, tính vận tốc,\nCharacterController.Move
+PC -> PC : cập nhật IsGrounded, VelocityY,\nHorizontalSpeed, Jumped
+SM -> PC : đọc dữ liệu vừa cập nhật
+SM -> SM : luật mở rộng (Attack / Crouch)\nrồi Current.Tick()
+SM -> AN : SetTrigger("Jump" / "Attack"),\nSetBool("IsGrounded", false) khi vào Fall
+AB -> AN : SetFloat("Speed", 0..1, damp 0.1)\nSetBool("IsGrounded"), SetBool("Crouch")\nLayer weight Upper Body
+HUD -> SM : State
+HUD -> PC : Speed, Grounded, VelocityY, Move mode
+@enduml
+
+@startuml ThuNam_Animator_Controller
+!theme plain
+hide empty description
+
+title Thứ Năm - Animator Controller (Player.controller, Root Motion tắt)
+
+state "Base Layer" as Base {
+  [*] --> Locomotion
+  state Locomotion : Blend Tree 1D theo Speed\nIdle 0 · Walk 0.5 · Run 1
+  state Jump : clip Jump (không loop)
+  state Fall : clip Fall (loop)
+  state Crouch : Blend Tree Crouch 0 · CrouchWalk 0.4
+
+  Locomotion --> Jump : Jump (trigger), 0.05 s
+  Jump --> Fall : Exit Time 0.7, 0.1 s
+  Locomotion --> Fall : IsGrounded = false, 0.1 s
+  Fall --> Locomotion : IsGrounded = true, 0.1 s
+  Locomotion --> Crouch : Crouch = true
+  Crouch --> Locomotion : Crouch = false
+  Crouch --> Fall : IsGrounded = false
 }
 
-state Hit {
-  note "Animator: Hit (Mode=2)\nKhóa điều khiển tạm thời (0.7s)" as N3
+state "Upper Body Action\n(Avatar Mask: thân trên, Override)" as Upper {
+  [*] --> Empty
+  Empty --> AttackClip : Attack (trigger)
+  AttackClip --> Empty : Exit Time 0.95
+  state "Attack" as AttackClip : Event OpenHitbox 0.16 s\nEvent CloseHitbox 0.65 s
 }
 
-state Dead {
-  note "Animator: Death (Mode=3)\nKhóa vĩnh viễn gameplay input" as N4
-}
-
-Grounded --> Airborne : Nhảy (Space) / Rơi khỏi bục
-Airborne --> Grounded : Chạm đất (Grounded = true)
-
-Grounded --> Hit : Nhận sát thương (H) \n& HP còn > 0
-Hit --> Grounded : Hết thời gian choáng (0.7s)
-Hit --> Airborne : Rơi khỏi bục lúc đang bị Hit
-
-Grounded --> Dead : Sát thương chí mạng (K hoặc HP = 0)
-Airborne --> Dead : Sát thương chí mạng (K)
-Hit --> Dead : Sát thương chí mạng (K)
-
-Dead --> Grounded : Nhấn Reset (R)
+note bottom of Upper
+  Weight 0 khi không đánh, AnimatorBridge tăng lên 1 trong lúc đánh
+  (layer Humanoid dù state rỗng vẫn ghi đè thân trên).
+end note
 @enduml

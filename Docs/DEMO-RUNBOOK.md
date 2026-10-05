@@ -1,24 +1,20 @@
-# Tuyến chơi thử T3/T5
+# Kịch bản demo (mục 10 đặc tả)
 
-Phím: WASD đi, Shift chạy, Space nhảy, Ctrl khom, chuột trái đánh, chuột xoay camera, C TPS ↔ góc rộng, H/K (DEBUG) Hit/Dead, R reset, F1 HUD, Esc nhả chuột, click để khóa lại.
+## Thứ Ba: điều khiển và camera (~2:10)
 
-## T3 — điều khiển và camera
+1. Chỉ Inspector của **Player**: Character Controller, Player Input, PlayerController, PlayerStateMachine. Bật Gizmos để thấy viên nang.
+2. **Sân rộng:** W đi về phía trước màn hình; xoay chuột, W vẫn đi theo camera. Nhấn **T**: HUD đổi `Move mode: World axes`, W luôn đi +Z dù camera quay đâu. T lần nữa để quay lại.
+3. **Bục cao:** lên bậc thang bên trái (bậc 0,2 m < Step Offset 0,3), nhảy lên bục 1,5 m, bước ra mép: rơi, `Grounded: False`, VelocityY âm dần.
+4. **Bậc 0,6 m** bên phải: bị chặn. **Dốc 30°**: leo được. **Dốc 60°**: bị chặn (Slope Limit 45).
+5. **Hành lang tường:** đứng giữa hành lang, xoay camera về phía tường: camera tiến sát nhân vật thay vì xuyên tường (Deoccluder).
+6. **Joystick ảo:** Game view → Simulator, kéo joystick trái, nhấn JUMP, kéo nửa phải để xoay camera.
 
-Chạy `Builds/T3/TrainingArena` (hoặc scene `TrainingArena_T3.unity`).
+## Thứ Năm: trạng thái và animation (~2:00)
 
-1. **A:** W đi, giữ Shift chạy. Xoay chuột 90°: W đổi hướng theo camera. W+D không nhanh hơn W (xem Speed trên HUD).
-2. **B:** chạy lên bậc thang tới platform. Giữ Space: chỉ nhảy một lần. Bấm Space trên không: không nhảy thêm. Nhảy xuống, tiếp đất ổn định.
-3. **C:** vào hành lang bên trái, xoay camera về phía tường. Camera không nằm trong tường, vẫn thấy nhân vật.
-4. Đứng yên, nhấn C: blend sang góc rộng, nhân vật không đổi vị trí. C lần nữa về TPS.
-5. R: về A, camera TPS.
+1. Khi đang Play, bỏ chọn **Animator** trên `Player/Model` rồi đi: nhân vật trượt, không cử động. Bật lại.
+2. Mở `Animator Controller`, Blend Tree Locomotion: Idle 0, Walk 0,5, Run 1.
+3. Đứng → giữ **Ctrl** đi bộ (`Speed` 0,5) → thả Ctrl chạy (`Speed` 1); hoặc đẩy joystick nhẹ rồi mạnh.
+4. Nhảy và bước khỏi mép bục: HUD `State: Jump` → `Fall` → `Idle`.
+5. (Mở rộng) **C** khom: `State: Crouch`; dưới thanh chắn thả C vẫn khom. Chuột trái gần dummy: `State: Attack`, dummy −25 HP; state mới thêm mà không sửa Idle/Move/Jump/Fall.
 
-## T5 — FSM và animation
-
-Chạy `Builds/T5/TrainingArena` (hoặc scene `TrainingArena.unity`).
-
-1. **A:** đứng yên (Idle thở), đi, chạy: Blend Tree theo Speed thực tế. Đâm vào tường: Speed về 0, không chạy tại chỗ.
-2. **B:** nhảy: Grounded → Airborne (Jump khi lên, Fall khi rơi) → Land → Grounded. Space trên không: HUD báo "Jump blocked in air".
-3. **D:** H: HP −25, Hit ~0,7 s, khóa di chuyển, tự về Grounded. H trên không: HUD báo "H only works when Grounded".
-4. K: Dead, giữ tư thế nằm, mọi phím gameplay bị chặn. R: HP 100, Grounded, về A.
-5. (Thêm) Ctrl dưới thanh chắn vàng: thả Ctrl vẫn khom vì có trần, HUD báo "Ceiling: cannot stand up"; ra ngoài tự đứng dậy.
-6. (Thêm) Đứng sát dummy vàng, quay mặt vào, click trái: tay phải bổ xuống, dummy −25 HP. Giữ chuột chỉ đánh một lần; vừa đi vừa đánh được; trên không bị chặn; H giữa đòn hủy đòn. R hồi dummy.
+R đưa nhân vật về điểm xuất phát bất cứ lúc nào.

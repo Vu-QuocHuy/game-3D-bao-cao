@@ -1,25 +1,15 @@
-# Đối chiếu với plan T3/T5
+# Đối chiếu đặc tả `dac-ta-game-demo-3d.md`
 
-Plan gốc: `../PLAN-TRIEN-KHAI-GAME-T3-T5.md` ở thư mục cha của project. Phạm vi sản phẩm là một training arena cho hai đề tài, không có slide.
-
-| Nhóm | Triển khai |
+| Mục | Trạng thái |
 |---|---|
-| G0 | Unity 6000.3.23f1, URP, Input System, Cinemachine; Unity MCP và Pipeline; config asset, prefab, hai scene |
-| G1 | Sân thử, bậc thang/platform, dốc, hành lang camera, thanh crouch, fixed zone, bẫy và dummy |
-| G2 | CharacterController, camera-relative movement, đi/chạy/nhảy/gravity/ground check, chuẩn hóa input, reset và rơi khỏi map |
-| G3 | TPS/FPS/top-down/fixed; Priority và blend; native Deoccluder/Impulse; damping, toggle, zone membership và reset |
-| G4 | 10 Generic clips cho nhân vật chơi; Blend Tree; rig/visual tách motor; khu riêng gồm hai Humanoid Avatar và các clip dùng chung để minh họa retargeting |
-| G5 | Lifecycle FSM; locomotion/action; Normal/Hit/Dead; bridge Animator; HUD logic, clip thực tế và history |
-| G6 | Health, bẫy theo nhịp, dummy, Animation Events, một damage/target/đòn, upper-body mask, bước chân/landing, reset |
-| G7 | Khu Humanoid và arena theo tuyến demo; không triển khai các khu so sánh P2 |
-| G8 | Hai cấu hình scene/build; kiểm tra Play Mode và standalone; hướng dẫn chơi cùng bằng chứng kiểm tra trong Docs |
+| 2 Thiết lập | Unity 6, URP, Input System (New), Cinemachine, TextMeshPro. Device Simulator và độ phân giải Game view chỉnh trong Editor |
+| 3 Bố cục | Sân 40×40 ô vuông 1 m, bậc 5 × 0,2 m, bậc 0,6 m, dốc 30° và 60°, bục 1,5 m, hành lang tường 3 m, vật cản trụ; layer Environment; Directional Light có bóng |
+| 4 Nhân vật | Player (CharacterController, Player Input, PlayerController, PlayerStateMachine) / Model (Humanoid, Avatar hợp lệ, Animator) / CameraTarget; thông số CC đúng bảng 4.3 |
+| 5 Input | Move, Look, Jump, Walk, ToggleWorldMove (+ Crouch, Attack); joystick ảo, nút nhảy, vùng kéo xoay camera |
+| 6 Script | PlayerController, IState/StateMachine/Idle/Move/Jump/Fall, AnimatorBridge, DebugHUD |
+| 7 Camera | Brain, CinemachineCamera Orbital Follow 4 m, damping, Deoccluder layer Environment radius 0,2, khóa con trỏ + Esc |
+| 8 Animator | Speed/IsGrounded/Jump, Locomotion Blend Tree 0/0,5/1, Jump, Fall, Root Motion tắt |
+| 9 Chức năng demo | T, tắt Animator khi Play, HUD State, R |
+| 12 Mở rộng | Animation Event (Footstep, hitbox); state Attack và Crouch thêm mà không sửa state gốc. Chưa làm: Rigidbody so sánh, APK |
 
-## Điều chỉnh asset so với plan
-
-Thay cách nhập Mixamo bằng rig và animation tạo trực tiếp trong Unity để project không cần tài khoản/tải asset ngoài. Nhân vật điều khiển dùng Generic; Humanoid/retargeting được minh họa trong khu riêng. Đây là thay đổi so với giả định “nhân vật chính Humanoid” trong plan. Không có asset FBX import hoặc quy trình Configure Avatar từ FBX.
-
-## Phần P2 không nằm trong bản chốt
-
-Coyote time/jump buffer, khu nhân vật Rigidbody, khu Root Motion, strafe Blend Tree 2D. Có binding gamepad cho di chuyển/nhảy nhưng chưa xác nhận toàn bộ trải nghiệm gamepad; bàn phím/chuột là cách chơi chính.
-
-Kết quả build và kiểm tra thực tế được ghi riêng trong `BUILD-NOTES.md`; không coi việc tạo script/asset là bằng chứng đã vượt kiểm tra.
+Khác biệt có chủ đích: crouch dùng phím **C** vì Ctrl là Walk theo đặc tả. Jump → Fall dùng exit time ngắn vì `IsGrounded` đã false ngay khi bật nhảy (đặc tả cho phép).

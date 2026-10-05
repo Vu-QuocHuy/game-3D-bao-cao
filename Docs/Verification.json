@@ -1,0 +1,362 @@
+{
+    "scene": "TrainingArena",
+    "passed": 71,
+    "failed": 0,
+    "checks": [
+        {
+            "name": "4.3 Character Controller values",
+            "passed": true,
+            "detail": "h 1.8 r 0.3 c (0.00, 0.90, 0.00) step 0.3 slope 45 skin 0.08"
+        },
+        {
+            "name": "5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove",
+            "passed": true,
+            "detail": "Move,Look,Jump,Walk,ToggleWorldMove,Crouch,Attack"
+        },
+        {
+            "name": "4.2 Humanoid model, valid Avatar, Root Motion off",
+            "passed": true,
+            "detail": "human True, valid True, root motion False"
+        },
+        {
+            "name": "4.1 Hierarchy Player/Model + Player/CameraTarget (y 1.5)",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "4.2 Clips Idle/Walk/Run/Fall loop, Jump does not",
+            "passed": true,
+            "detail": "Idle:True,Walk:True,Run:True,Jump:False,Fall:True,Crouch:True,CrouchWalk:True,Attack:False"
+        },
+        {
+            "name": "8.1 Parameters Speed/IsGrounded/Jump",
+            "passed": true,
+            "detail": "Speed:Float,IsGrounded:Bool,Jump:Trigger,Crouch:Bool,Attack:Trigger"
+        },
+        {
+            "name": "8.2 States Locomotion/Jump/Fall, Locomotion default",
+            "passed": true,
+            "detail": "current Locomotion"
+        },
+        {
+            "name": "3 Environment layer used by ground and Deoccluder",
+            "passed": true,
+            "detail": "layer 6, deoccluder mask 64"
+        },
+        {
+            "name": "7 Third-person camera: Orbital Follow 4 m, damping, Deoccluder radius 0.2",
+            "passed": true,
+            "detail": "radius 4, damping 0.2, cam radius 0.2"
+        },
+        {
+            "name": "7 Main Camera has Cinemachine Brain",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "3 Directional Light with shadows",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "11 W walks toward the screen (camera forward)",
+            "passed": true,
+            "detail": "moved 4.00, dot 1.00"
+        },
+        {
+            "name": "6.1 Run speed 5 m/s",
+            "passed": true,
+            "detail": "5.00 m/s"
+        },
+        {
+            "name": "11 W still forward after turning camera 90 deg",
+            "passed": true,
+            "detail": "turned 90, dot 1.00"
+        },
+        {
+            "name": "6.1 Diagonal input not faster (and not slower)",
+            "passed": true,
+            "detail": "W 5.00, W+D 5.00"
+        },
+        {
+            "name": "6.1 Character turns toward movement",
+            "passed": true,
+            "detail": "forward (0.73,0.00,0.68)"
+        },
+        {
+            "name": "11 T switches to world axes, HUD follows",
+            "passed": true,
+            "detail": "move (0.00,0.00,1.00), camera fwd (1.00,0.00,0.05)"
+        },
+        {
+            "name": "11 T switches back to camera-relative",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "11 Holding Space jumps once",
+            "passed": true,
+            "detail": "jumps 1"
+        },
+        {
+            "name": "6.1 Jump height ~1.2 m (gravity -20)",
+            "passed": true,
+            "detail": "peak 1.14 m"
+        },
+        {
+            "name": "11 No jump while airborne",
+            "passed": true,
+            "detail": "vy before 2.9, after 1.6, 'Jump only when grounded'"
+        },
+        {
+            "name": "6.1 Grounded keeps VelocityY = -2",
+            "passed": true,
+            "detail": "vy -2.33"
+        },
+        {
+            "name": "3 Ledge platform is 1.5 m",
+            "passed": true,
+            "detail": "standing at y 1.58"
+        },
+        {
+            "name": "11 Stepping off the ledge enters Fall",
+            "passed": true,
+            "detail": "Fall state True, Fall anim True, jump False"
+        },
+        {
+            "name": "6.2 Landing returns to Idle",
+            "passed": true,
+            "detail": "state Idle"
+        },
+        {
+            "name": "11 0.2 m stairs climbable",
+            "passed": true,
+            "detail": "max height 1.08 m (top step 1.0)"
+        },
+        {
+            "name": "6.2 Climbing stairs does not flicker into Fall",
+            "passed": true,
+            "detail": "Fall not entered while climbing"
+        },
+        {
+            "name": "3 Jump from the stairs onto the 1.5 m ledge",
+            "passed": true,
+            "detail": "y 1.58"
+        },
+        {
+            "name": "11 0.6 m step blocks the character",
+            "passed": true,
+            "detail": "pos (3.70,0.08,0.00)"
+        },
+        {
+            "name": "11 30 deg slope climbable",
+            "passed": true,
+            "detail": "max height 1.76 m (top 1.6)"
+        },
+        {
+            "name": "11 60 deg slope blocks the character",
+            "passed": true,
+            "detail": "max height 0.08 m (top 1.73)"
+        },
+        {
+            "name": "11 Camera moves closer when a wall is in the way",
+            "passed": true,
+            "detail": "raw blocked True, camera (-0.75,1.78,14.00), distance 0.78"
+        },
+        {
+            "name": "8 Idle: Speed 0, Locomotion",
+            "passed": true,
+            "detail": "Speed 0.00"
+        },
+        {
+            "name": "6.1 Ctrl walks at 2 m/s",
+            "passed": true,
+            "detail": "2.00 m/s"
+        },
+        {
+            "name": "8.1 Speed normalized: walk 0.5, run 1",
+            "passed": true,
+            "detail": "walk 0.50, run 1.00"
+        },
+        {
+            "name": "11 Blend Tree: Speed rises smoothly Walk -> Run",
+            "passed": true,
+            "detail": "13 intermediate samples, monotonic True"
+        },
+        {
+            "name": "6.2 FSM Idle > Move > Jump > Fall > Move/Idle",
+            "passed": true,
+            "detail": "Idle > Move > Jump > Fall > Move > Idle"
+        },
+        {
+            "name": "11 HUD shows the current state on every frame",
+            "passed": true,
+            "detail": "HUD 'State:' matched the FSM each sample"
+        },
+        {
+            "name": "6.2 History logged",
+            "passed": true,
+            "detail": "Idle → Move | Move → Jump | Jump → Fall | Fall → Move | Move → Idle"
+        },
+        {
+            "name": "4.2 Idle clip moves the rig (breathing)",
+            "passed": true,
+            "detail": "spine 1.2 deg"
+        },
+        {
+            "name": "4.2 Walk swings legs, bends knees, swings arms",
+            "passed": true,
+            "detail": "thigh 46, knee 31, arm 38 deg"
+        },
+        {
+            "name": "4.2 Run swings wider than Walk",
+            "passed": true,
+            "detail": "walk 46, run 66 deg"
+        },
+        {
+            "name": "4.2 Feet on the floor (not floating or sunk)",
+            "passed": true,
+            "detail": "lowest ankle -0.03 m above the controller base"
+        },
+        {
+            "name": "9 Animator off: character slides without moving its legs",
+            "passed": true,
+            "detail": "moved 4.00 m, leg 0.0 deg"
+        },
+        {
+            "name": "Crouch: C crouches (state + animation)",
+            "passed": true,
+            "detail": "state Crouch, anim Crouch"
+        },
+        {
+            "name": "Crouch: hips lowered",
+            "passed": true,
+            "detail": "hips 0.38 m"
+        },
+        {
+            "name": "Crouch: jump blocked",
+            "passed": true,
+            "detail": "'Jump blocked while crouched'"
+        },
+        {
+            "name": "Crouch: moves at 1.6 m/s",
+            "passed": true,
+            "detail": "1.60 m/s"
+        },
+        {
+            "name": "Crouch: releasing C in the open stands up",
+            "passed": true,
+            "detail": "state Idle"
+        },
+        {
+            "name": "Crouch: standing player blocked by the beam",
+            "passed": true,
+            "detail": "z -7.38"
+        },
+        {
+            "name": "Crouch: under the beam with C released stays crouched",
+            "passed": true,
+            "detail": "z -5.62, crouched True"
+        },
+        {
+            "name": "Crouch: camera clear of the beam",
+            "passed": true,
+            "detail": "camera (-6.00,1.16,-6.10)"
+        },
+        {
+            "name": "Crouch: stands up after leaving the beam",
+            "passed": true,
+            "detail": "z -2.38"
+        },
+        {
+            "name": "Attack: LMB enters Attack state + upper-body layer",
+            "passed": true,
+            "detail": "state True, layer True"
+        },
+        {
+            "name": "Attack: arm swings",
+            "passed": true,
+            "detail": "115 deg"
+        },
+        {
+            "name": "Attack: Animation Events open the hitbox, dummy -25 once",
+            "passed": true,
+            "detail": "dummy 75"
+        },
+        {
+            "name": "Attack: state returns to Idle",
+            "passed": true,
+            "detail": "Idle"
+        },
+        {
+            "name": "Attack: holding LMB swings once",
+            "passed": true,
+            "detail": "dummy 50"
+        },
+        {
+            "name": "Attack: cooldown blocks a second click",
+            "passed": true,
+            "detail": "'Attack on cooldown'"
+        },
+        {
+            "name": "Attack: legs keep walking during the swing (upper-body mask)",
+            "passed": true,
+            "detail": "leg 68 deg, base Locomotion"
+        },
+        {
+            "name": "Attack: blocked in the air",
+            "passed": true,
+            "detail": "'Attack only when grounded'"
+        },
+        {
+            "name": "5 Canvas has joystick, jump button, look drag area, EventSystem",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "5 Joystick (On-Screen Stick) moves the character forward",
+            "passed": true,
+            "detail": "moved (0.00,0.00,3.00)"
+        },
+        {
+            "name": "10 Light joystick push walks (Speed < 1)",
+            "passed": true,
+            "detail": "Speed 0.57, 2.34 m/s"
+        },
+        {
+            "name": "5 On-Screen Button jumps",
+            "passed": true,
+            "detail": "vy -2.3"
+        },
+        {
+            "name": "5 Dragging the right side turns the camera",
+            "passed": true,
+            "detail": "yaw 0 -> 80"
+        },
+        {
+            "name": "9 R resets position, state, move mode, dummy",
+            "passed": true,
+            "detail": "pos (0.00,0.08,0.00), state Idle, dummy 100"
+        },
+        {
+            "name": "6.4 HUD lines State/Speed/Grounded/VelocityY/Move mode",
+            "passed": true,
+            "detail": "State: Idle | Speed: 0.0 m/s | Grounded: True | VelocityY: -2.3 | Move mode: Camera-relative | Crouched: False   Hitbox: closed"
+        },
+        {
+            "name": "6.4 HUD font readable on screen share",
+            "passed": true,
+            "detail": "font 34"
+        },
+        {
+            "name": "6.4 F1 hides/shows the HUD",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "FSM visited Idle/Move/Jump/Fall/Crouch/Attack",
+            "passed": true,
+            "detail": "Idle,Move,Jump,Fall,Crouch,Attack"
+        }
+    ]
+}
