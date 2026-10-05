@@ -15,7 +15,7 @@ public sealed class CameraCoordinator : MonoBehaviour {
     public bool ModeWide { get; private set; }
     public string ModeName => ModeWide ? "WIDE ANGLE" : "TPS";
     
-    float yaw, pitch = 18;
+    float yaw, pitch = 18, focusHeight = 1.55f;
     Vector3 smoothPosition;
     PlayerMotor motor;
     
@@ -26,7 +26,7 @@ public sealed class CameraCoordinator : MonoBehaviour {
     
     public void ResetCamera() {
         ModeWide = false;
-        yaw = 0; pitch = 18;
+        yaw = 0; pitch = 18; focusHeight = 1.55f;
         if (tps) {
             smoothPosition = player.position + new Vector3(0, 3, -5);
             tps.PreviousStateIsValid = false;
@@ -46,13 +46,15 @@ public sealed class CameraCoordinator : MonoBehaviour {
         yaw += input.Look.x * 0.12f;
         pitch = Mathf.Clamp(pitch - input.Look.y * 0.1f, -30, 70);
         
-        Vector3 focus = player.position + Vector3.up * 1.55f;
+        float blend = 1 - Mathf.Exp(-9 * Time.deltaTime);
+        // Follow the crouched head: a fixed 1.55 m focus sits inside the 1.25 m crouch beam and the Deoccluder has nowhere to go.
+        focusHeight = Mathf.Lerp(focusHeight, motor.Crouched ? .95f : 1.55f, blend);
+        Vector3 focus = player.position + Vector3.up * focusHeight;
         if (targetPivot) targetPivot.position = focus;
         
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
         Vector3 desired = focus - rotation * Vector3.forward * 5.2f;
         
-        float blend = 1 - Mathf.Exp(-9 * Time.deltaTime);
         smoothPosition = Vector3.Lerp(smoothPosition, desired, blend);
         
         if (tps) {
