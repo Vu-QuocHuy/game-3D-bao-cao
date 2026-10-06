@@ -79,7 +79,7 @@ public static class DemoSceneBuilder {
   var combat = player.AddComponent<PlayerCombat>();
   var controller = player.AddComponent<PlayerController>(); controller.spawn = spawn;
   var states = player.AddComponent<PlayerStateMachine>();
-  var cameraTarget = new GameObject("CameraTarget").transform; cameraTarget.SetParent(player.transform, false); cameraTarget.localPosition = new Vector3(0, 1.5f, 0); controller.cameraTarget = cameraTarget;
+  var cameraTarget = new GameObject("CameraTarget").transform; cameraTarget.SetParent(player.transform, false); cameraTarget.localPosition = new Vector3(0, 1.55f, 0); controller.cameraTarget = cameraTarget;
 
   var model = HumanoidModel(white, teal, dark, out var bones, out var avatar);
   var animator = model.AddComponent<Animator>(); animator.avatar = avatar; animator.applyRootMotion = false; animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
@@ -89,23 +89,25 @@ public static class DemoSceneBuilder {
   bridge.audioSource = model.AddComponent<AudioSource>(); bridge.audioSource.playOnAwake = false; bridge.footstep = AssetDatabase.LoadAssetAtPath<AudioClip>(Root + "/Audio/Footstep.wav");
   states.player = controller; states.combat = combat; states.animator = animator;
 
-  // ---- Section 7: camera. ----
-  var mainCam = new GameObject("Main Camera") { tag = "MainCamera" }.AddComponent<Camera>(); mainCam.fieldOfView = 55; mainCam.nearClipPlane = .1f; mainCam.backgroundColor = new Color(.05f, .08f, .12f); mainCam.clearFlags = CameraClearFlags.SolidColor;
+  // ---- Section 7: camera. Framing matches the project's first commit: 5.2 m behind, pitch 18 (-30..70), FOV 60,
+  //      look at 1.55 m (0.9 m crouched), position damping ~0.11 s (first commit: lerp 1 - e^(-9 dt)). ----
+  var mainCam = new GameObject("Main Camera") { tag = "MainCamera" }.AddComponent<Camera>(); mainCam.fieldOfView = 60; mainCam.nearClipPlane = .08f; mainCam.backgroundColor = new Color(.05f, .08f, .12f); mainCam.clearFlags = CameraClearFlags.SolidColor;
   mainCam.gameObject.AddComponent<AudioListener>(); mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = true;
   mainCam.transform.position = new Vector3(0, 2.5f, -4);
   var cmBrain = mainCam.gameObject.AddComponent<CinemachineBrain>(); cmBrain.DefaultBlend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Styles.EaseInOut, .5f);
-  var vcam = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>(); vcam.Follow = cameraTarget; vcam.Lens.FieldOfView = 55; vcam.Lens.NearClipPlane = .1f; vcam.Priority = 20; // Tracking Target = CameraTarget
-  var orbit = vcam.gameObject.AddComponent<CinemachineOrbitalFollow>(); orbit.OrbitStyle = CinemachineOrbitalFollow.OrbitStyles.Sphere; orbit.Radius = 4;
-  var tracker = orbit.TrackerSettings; tracker.BindingMode = BindingMode.WorldSpace; tracker.PositionDamping = new Vector3(.2f, .2f, .2f); orbit.TrackerSettings = tracker;
+  var vcam = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>(); vcam.Follow = cameraTarget; vcam.Lens.FieldOfView = 60; vcam.Lens.NearClipPlane = .08f; vcam.Priority = 20; // Tracking Target = CameraTarget
+  var orbit = vcam.gameObject.AddComponent<CinemachineOrbitalFollow>(); orbit.OrbitStyle = CinemachineOrbitalFollow.OrbitStyles.Sphere; orbit.Radius = 5.2f;
+  var tracker = orbit.TrackerSettings; tracker.BindingMode = BindingMode.WorldSpace; tracker.PositionDamping = new Vector3(.11f, .11f, .11f); orbit.TrackerSettings = tracker;
   var h = orbit.HorizontalAxis; h.Range = new Vector2(-180, 180); h.Wrap = true; h.Value = 0; orbit.HorizontalAxis = h;
-  var v = orbit.VerticalAxis; v.Range = new Vector2(-20, 70); v.Value = 15; v.Center = 15; orbit.VerticalAxis = v;
-  var composer = vcam.gameObject.AddComponent<CinemachineRotationComposer>(); composer.Damping = new Vector2(.1f, .1f);
+  var v = orbit.VerticalAxis; v.Range = new Vector2(-30, 70); v.Value = 18; v.Center = 18; orbit.VerticalAxis = v;
+  var composer = vcam.gameObject.AddComponent<CinemachineRotationComposer>(); composer.Damping = Vector2.zero; // first commit: camera always looks straight at the focus
   var deoccluder = vcam.gameObject.AddComponent<CinemachineDeoccluder>(); deoccluder.CollideAgainst = 1 << Environment; deoccluder.IgnoreTag = "Player"; deoccluder.MinimumDistanceFromTarget = .3f;
-  var avoid = deoccluder.AvoidObstacles; avoid.Enabled = true; avoid.CameraRadius = .2f; avoid.Strategy = CinemachineDeoccluder.ObstacleAvoidance.ResolutionStrategy.PullCameraForward; avoid.Damping = .2f; avoid.DampingWhenOccluded = 0; deoccluder.AvoidObstacles = avoid;
+  var avoid = deoccluder.AvoidObstacles; avoid.Enabled = true; avoid.CameraRadius = .25f; avoid.Strategy = CinemachineDeoccluder.ObstacleAvoidance.ResolutionStrategy.PullCameraForward; avoid.Damping = .15f; avoid.DampingWhenOccluded = 0; deoccluder.AvoidObstacles = avoid;
   var orbitInput = vcam.gameObject.AddComponent<CameraOrbitInput>(); orbitInput.playerInput = input;
-  // Wide-angle camera (V): no procedural components, CameraModeSwitcher drives its transform.
-  var wideCam = new GameObject("CM Wide Angle").AddComponent<CinemachineCamera>(); wideCam.Lens.FieldOfView = 55; wideCam.Lens.NearClipPlane = .1f; wideCam.Priority = 0;
-  var cameraMode = new GameObject("Camera Mode").AddComponent<CameraModeSwitcher>(); cameraMode.playerInput = input; cameraMode.player = player.transform; cameraMode.thirdPerson = vcam; cameraMode.wide = wideCam;
+  // First person and top down (T cycles TPS -> FPS -> top down): no procedural components, CameraModeSwitcher places them.
+  CinemachineCamera FixedCam(string name) { var c = new GameObject(name).AddComponent<CinemachineCamera>(); c.Lens.FieldOfView = 60; c.Lens.NearClipPlane = .08f; c.Priority = 0; return c; }
+  var cameraMode = new GameObject("Camera Mode").AddComponent<CameraModeSwitcher>(); cameraMode.playerInput = input; cameraMode.player = player.transform; cameraMode.cameraTarget = cameraTarget;
+  cameraMode.orbit = orbit; cameraMode.thirdPerson = vcam; cameraMode.firstPerson = FixedCam("CM First Person"); cameraMode.topDown = FixedCam("CM Top Down");
 
   // ---- Sections 5 + 6.4: HUD, on-screen joystick and jump button. ----
   var hud = Ui(controller, states, combat, cameraMode);
@@ -175,8 +177,7 @@ public static class DemoSceneBuilder {
   var look = map.AddAction("Look", InputActionType.Value); look.expectedControlType = "Vector2"; look.AddBinding("<Mouse>/delta"); look.AddBinding("<Gamepad>/rightStick");
   map.AddAction("Jump", InputActionType.Button, "<Keyboard>/space").AddBinding("<Gamepad>/buttonSouth"); // also the On-Screen Button
   map.AddAction("Walk", InputActionType.Button, "<Keyboard>/leftCtrl");
-  map.AddAction("ToggleWorldMove", InputActionType.Button, "<Keyboard>/t");
-  map.AddAction("ToggleCamera", InputActionType.Button, "<Keyboard>/v");
+  map.AddAction("ToggleCamera", InputActionType.Button, "<Keyboard>/t"); // T: third person -> first person -> top down
   map.AddAction("Crouch", InputActionType.Button, "<Keyboard>/c");
   map.AddAction("Attack", InputActionType.Button, "<Mouse>/leftButton");
   string path = Root + "/Input/PlayerControls.inputactions"; File.WriteAllText(path, asset.ToJson()); Object.DestroyImmediate(asset);

@@ -2,43 +2,53 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 namespace TrainingArena {
-// Restores the "wide angle" view: V toggles third-person <-> a fixed high angle behind the player, blended by the
-// Cinemachine Brain. Only the live camera's Priority changes, so the player is never moved. The wide camera is a
-// Cinemachine Camera with no procedural components, so it keeps the transform this script gives it every frame.
+public enum CameraMode { ThirdPerson, FirstPerson, TopDown }
+
+// T cycles the three camera angles of the project's first commit: third person -> first person -> top down.
+// Only the live camera's Priority changes (the Brain blends), so the player is never moved.
+// First person and top down are Cinemachine Cameras with no procedural components; this script places them.
 [DefaultExecutionOrder(-20)]
 public sealed class CameraModeSwitcher : MonoBehaviour {
     public PlayerInput playerInput;
-    public Transform player;
-    public CinemachineCamera thirdPerson, wide;
-    public Vector3 wideOffset = new Vector3(0, 10, -12);
-    public float widePitch = 45;
+    public Transform player, cameraTarget;
+    public CinemachineOrbitalFollow orbit; // its yaw/pitch also aim the first-person view
+    public CinemachineCamera thirdPerson, firstPerson, topDown;
+    public Vector3 topDownOffset = new Vector3(0, 14, -5);
+    public float topDownPitch = 70, eyeForward = .15f;
 
-    public bool Wide { get; private set; }
-    public string ModeName => Wide ? "WIDE ANGLE" : "THIRD PERSON";
+    public CameraMode Mode { get; private set; }
+    public string ModeName => Mode == CameraMode.ThirdPerson ? "THIRD PERSON" : Mode == CameraMode.FirstPerson ? "FIRST PERSON" : "TOP DOWN";
 
     InputAction toggle;
+    Renderer[] model;
 
-    void Awake() => toggle = playerInput.actions["ToggleCamera"];
+    void Awake() {
+        toggle = playerInput.actions["ToggleCamera"];
+        model = player.GetComponentsInChildren<Renderer>();
+    }
 
     void Update() {
-        if (toggle.WasPressedThisFrame()) SetWide(!Wide);
+        if (toggle.WasPressedThisFrame()) SetMode((CameraMode)(((int)Mode + 1) % 3));
     }
 
     void LateUpdate() {
-        // Follow the player but keep a fixed world rotation, so the picture stays steady while the character turns.
-        wide.transform.SetPositionAndRotation(player.position + wideOffset, Quaternion.Euler(widePitch, 0, 0));
+        var look = Quaternion.Euler(orbit.VerticalAxis.Value, orbit.HorizontalAxis.Value, 0);
+        firstPerson.transform.SetPositionAndRotation(cameraTarget.position + look * Vector3.forward * eyeForward, look);
+        topDown.transform.SetPositionAndRotation(player.position + topDownOffset, Quaternion.Euler(topDownPitch, 0, 0));
     }
 
-    public void SetWide(bool value) {
-        Wide = value;
-        thirdPerson.Priority = value ? 0 : 20;
-        wide.Priority = value ? 20 : 0;
+    public void SetMode(CameraMode mode) {
+        Mode = mode;
+        thirdPerson.Priority = mode == CameraMode.ThirdPerson ? 20 : 0;
+        firstPerson.Priority = mode == CameraMode.FirstPerson ? 20 : 0;
+        topDown.Priority = mode == CameraMode.TopDown ? 20 : 0;
+        foreach (var r in model) if (r) r.enabled = mode != CameraMode.FirstPerson; // first person: don't look at the inside of your own head
     }
 
-    // Jump straight to the third-person camera (no blend), used by R.
+    // Straight back to third person (no blend), used by R.
     public void ResetMode() {
-        SetWide(false);
-        wide.PreviousStateIsValid = false;
+        SetMode(CameraMode.ThirdPerson);
+        firstPerson.PreviousStateIsValid = topDown.PreviousStateIsValid = false;
     }
 }
 }

@@ -4,7 +4,7 @@ Ngày kiểm: 05/10/2026 · Unity 6000.3.23f1 · build Linux `Builds/TrainingAre
 
 ## 1. Kết luận
 
-**Phần dựng project và chức năng: đáp ứng đủ.** Mọi mục bắt buộc ở mục 3–9 và toàn bộ checklist "Kiểm tra chức năng" ở mục 11 đã được kiểm bằng chạy thật: **79/79 mục đạt** (71 mục đã đạt hai lần liên tiếp trước khi thêm góc rộng; 8 mục góc rộng chạy một lần) (`Verification.json`, ảnh trong `VerifyShots/`).
+**Phần dựng project và chức năng: đáp ứng đủ, trừ một mục bỏ theo yêu cầu:** phím T không còn đổi hướng đi theo camera/trục thế giới (mục 5, 9, 11) mà dùng để đổi góc camera như commit đầu tiên; camera third person cách 5,2 m thay vì ~4 m (mục 7). Mọi mục còn lại ở mục 3–9 và checklist "Kiểm tra chức năng" ở mục 11 đã được kiểm bằng chạy thật: **85/85 mục đạt** (`Verification.json`, ảnh trong `VerifyShots/`).
 
 **Chưa hoàn thành (không thuộc phạm vi code, hoặc cần người làm tay):**
 
@@ -42,7 +42,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 | Dốc thoải | ~30° | Đạt | Leo tới độ cao 1,76 m |
 | Dốc quá dốc | ~60° | Đạt | Bị chặn: độ cao tối đa 0,08 m |
 | Bục cao có mép | ~1,5 m, nhảy lên từ bậc thang | Đạt | Đứng ở y = 1,58; nhảy từ bậc thang lên được |
-| Tường chắn camera | 2 Cube ~3 m tạo hành lang hẹp | Đạt | Camera kéo sát còn 0,78 m (bán kính 4 m) |
+| Tường chắn camera | 2 Cube ~3 m tạo hành lang hẹp | Đạt | Camera kéo sát còn 0,74 m (bán kính 5,2 m) |
 | Vật cản nhỏ | Tùy chọn | Đạt | 3 trụ Cylinder |
 | Layer Environment | Sàn, bậc, dốc, tường | Đạt | layer 6; Deoccluder chỉ va layer này |
 | Ánh sáng | Directional Light, bóng đổ | Đạt | |
@@ -51,7 +51,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 
 | Yêu cầu | Trạng thái | Bằng chứng / ghi chú |
 |---|---|---|
-| Hierarchy `Player/Model` + `Player/CameraTarget` (y 1,5) | Đạt | `4.1 Hierarchy…` |
+| Hierarchy `Player/Model` + `Player/CameraTarget` (y 1,55 như commit đầu) | Đạt | `4.1 Hierarchy…` |
 | Model Humanoid, Avatar hợp lệ | Đạt | `4.2 Humanoid model, valid Avatar…` |
 | Clip Idle/Walk/Run/Jump/Fall; Loop đúng | Đạt | Idle, Walk, Run, Fall loop; Jump không loop |
 | Chuyển động xương thật (không đứng hình) | Đạt | Idle: cột sống 1,2°; Walk: đùi 46°, gối 31°, tay 38°; Run đùi 66° |
@@ -62,7 +62,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 
 | Yêu cầu | Trạng thái | Bằng chứng / ghi chú |
 |---|---|---|
-| Move, Look, Jump, Walk, ToggleWorldMove | Đạt | `5 Player Input…` (kèm Crouch, Attack) |
+| Move, Look, Jump, Walk, ToggleWorldMove | Một phần | Có Move, Look, Jump, Walk (kèm Crouch, Attack). **ToggleWorldMove bỏ theo yêu cầu**; phím T nay là ToggleCamera |
 | Binding bàn phím/chuột/tay cầm | Đạt | WASD, Mouse Delta, Space, Left Ctrl, T; Left/Right Stick, Button South |
 | Joystick ảo (On-Screen Stick `<Gamepad>/leftStick`) | Đạt | Đẩy lên: nhân vật tiến 3,0 m, state Move |
 | Nút nhảy (On-Screen Button `<Gamepad>/buttonSouth`) | Đạt | Nhảy được |
@@ -74,7 +74,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 | Yêu cầu | Trạng thái | Bằng chứng / ghi chú |
 |---|---|---|
 | Hướng đi theo camera, bỏ y, chuẩn hóa | Đạt | W đi đúng hướng camera (dot 1,00), kể cả sau khi xoay 90° |
-| Phím T đảo chế độ hướng đi | Đạt | Camera nhìn +X, W vẫn đi +Z; HUD đổi `World axes` |
+| Phím T đảo chế độ hướng đi | Bỏ theo yêu cầu | T nay đổi góc camera; W luôn đi theo camera |
 | Tốc độ 5 (chạy) / 2 (Ctrl) m/s | Đạt | 5,00 / 2,00 |
 | Đi chéo không nhanh hơn | Đạt | W 5,00; W+D 5,00 (đo trên sàn trống) |
 | Trọng lực −20, chạm đất giữ −2 | Đạt | VelocityY khi đứng −2,33 (đã cộng gia tốc 1 khung) |
@@ -85,7 +85,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 | `IState`, `StateMachine`, Idle/Move/Jump/Fall | Đạt | Chuỗi `Idle > Move > Jump > Fall > Move > Idle` |
 | Thứ tự cập nhật (PlayerController trước, StateMachine sau) | Đạt | Execution Order 0 → 10 → 20 → 30 |
 | `AnimatorBridge`, Speed chuẩn hóa 0–1 | Đạt | walk 0,50, run 1,00 |
-| `DebugHUD`: State, Speed, Grounded, VelocityY, Move mode | Đạt | HUD khớp FSM ở mọi mẫu; cỡ chữ 34 |
+| `DebugHUD`: State, Speed, Grounded, VelocityY, Move mode | Một phần | Có State, Speed, Grounded, VelocityY, `Camera:`; dòng Move mode bỏ cùng phím T |
 
 ### Mục 7 – Camera
 
@@ -93,9 +93,9 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 |---|---|---|
 | Cinemachine Brain trên Main Camera | Đạt | |
 | Tracking Target = CameraTarget; Orbital Follow | Đạt | |
-| Distance ~4 m, damping 0,1–0,3 | Đạt | 4 m; 0,2 |
+| Distance ~4 m, damping 0,1–0,3 | Khác theo yêu cầu | 5,2 m như commit đầu; damping 0,11 (trong khoảng). Vị trí camera đo khớp công thức commit đầu (pitch 18°, nhìn vào 1,55 m) |
 | Xoay bằng action Look | Đạt | Chuột và nửa phải màn hình |
-| Deoccluder, layer Environment, radius ~0,2 | Đạt | Camera không xuyên tường, không bị che (`11 Camera moves closer…`) |
+| Deoccluder, layer Environment, radius ~0,2 | Đạt | Radius 0,25 như commit đầu; camera không xuyên tường, không bị che (`11 Camera moves closer…`) |
 | Khóa/ẩn con trỏ, Esc mở lại | Chưa kiểm tự động | Có trong mã (`DemoController`); cần thử tay |
 
 ### Mục 8 – Animator Controller
@@ -114,7 +114,7 @@ Cột "Bằng chứng" ghi tên mục kiểm trong `Verification.json`.
 
 | Yêu cầu | Trạng thái | Bằng chứng / ghi chú |
 |---|---|---|
-| Phím T | Đạt | |
+| Phím T | Bỏ theo yêu cầu | T đổi góc camera third person → first person → top-down |
 | Tắt/bật Animator khi Play | Đạt | Tắt Animator: đi 4,00 m, chân không cử động (0,0°) |
 | Hiển thị tên trạng thái | Đạt | |
 | Phím R | Đạt | Về xuất phát, Idle, hồi dummy, về chế độ camera-relative |
@@ -128,12 +128,12 @@ Các bước Thứ Ba và Thứ Năm đều có điểm trong scene và đã ki�
 
 **Dựng scene:** 3/4 đạt. Còn lại: joystick trong Device Simulator.
 
-**Kiểm tra chức năng (8/8 đạt):**
+**Kiểm tra chức năng (7/8 đạt, 1 mục bỏ theo yêu cầu):**
 
 | Mục | Kết quả |
 |---|---|
 | W luôn đi về phía trước màn hình khi camera xoay | Đạt |
-| T đảo chế độ hướng đi, HUD đổi theo | Đạt |
+| T đảo chế độ hướng đi, HUD đổi theo | Bỏ theo yêu cầu (T đổi góc camera) |
 | Nhảy chỉ khi chạm đất | Đạt |
 | Bước khỏi mép bục: vào Fall | Đạt |
 | Bậc 0,2 m leo được, 0,6 m bị chặn; dốc 30° leo được, 60° bị chặn | Đạt |
@@ -152,12 +152,12 @@ Các bước Thứ Ba và Thứ Năm đều có điểm trong scene và đã ki�
 | Capsule Rigidbody so sánh | Chưa làm |
 | Build APK | Chưa làm |
 
-## 3. Phần thêm ngoài đặc tả (theo yêu cầu: giữ Crouch, Attack và góc rộng)
+## 3. Phần thêm ngoài đặc tả (theo yêu cầu: giữ Crouch, Attack; đổi góc camera bằng T)
 
 | Tính năng | Hành vi | Kiểm |
 |---|---|---|
 | Crouch (phím **C**; Ctrl dành cho Walk) | Khom 1,6 m/s, cấm nhảy; dưới thanh chắn thả C vẫn giữ thấp; camera hạ theo, không kẹt trong thanh | 9 mục |
-| Góc rộng (phím **V**, khôi phục từ bản trước) | Đổi third person ↔ camera cao 10 m phía sau, nghiêng 45°, có blend 0,5 s; không đổi vị trí nhân vật; R về third person; HUD dòng `Camera:` | 8 mục |
+| Đổi góc camera (phím **T**, thông số commit đầu tiên) | Third person (5,2 m, pitch 18°, FOV 60) → first person (ẩn model) → top-down (14 m, lùi 5 m, 70°); blend 0,5 s; không đổi vị trí nhân vật; R về third person; HUD dòng `Camera:`; phím V không còn tác dụng | 17 mục |
 | Attack (chuột trái) | Event mở/đóng hitbox; 0,85 s, cooldown 1 s, −25 HP dummy; giữ chuột chỉ đánh một lần; đi được khi đánh; chặn trên không | 8 mục |
 
 Hai tính năng không ảnh hưởng 4 state gốc: Idle/Move/Jump/Fall giữ nguyên điều kiện chuyển ở mục 6.2.
@@ -168,6 +168,8 @@ Hai tính năng không ảnh hưởng 4 state gốc: Idle/Move/Jump/Fall giữ n
 2. Jump → Fall dùng Exit Time (mục 8 ở trên).
 3. Layer Upper Body (Attack) có weight 0 khi không đánh và được `AnimatorBridge` bật khi đang đánh; layer Humanoid dù ở state rỗng vẫn ghi đè thân trên và làm đơ tay (lỗi đã gặp và sửa khi test).
 4. Khi xuống bậc 0,2 m, `PlayerController` thêm một bước bám sàn trong tầm Step Offset để không nháy sang Fall; đặc tả không nói đến chi tiết này.
+5. Theo yêu cầu: phím T đổi góc camera (third person → first person → top-down) thay cho đổi hướng đi theo camera/trục thế giới; bỏ action ToggleWorldMove và dòng HUD `Move mode`.
+6. Theo yêu cầu: camera lấy thông số commit đầu tiên (5,2 m, FOV 60, pitch 18°, nhìn vào 1,55 m, Deoccluder radius 0,25) thay cho ~4 m / radius ~0,2 của mục 7.
 
 ## 5. Rủi ro và giới hạn của chính bộ kiểm
 

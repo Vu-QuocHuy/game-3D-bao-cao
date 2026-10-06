@@ -1,6 +1,6 @@
 {
     "scene": "TrainingArena",
-    "passed": 79,
+    "passed": 85,
     "failed": 0,
     "checks": [
         {
@@ -9,9 +9,9 @@
             "detail": "h 1.8 r 0.3 c (0.00, 0.90, 0.00) step 0.3 slope 45 skin 0.08"
         },
         {
-            "name": "5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove",
+            "name": "5 Player Input: Move/Look/Jump/Walk/ToggleCamera on T, no V, no world-move toggle",
             "passed": true,
-            "detail": "Move,Look,Jump,Walk,ToggleWorldMove,ToggleCamera,Crouch,Attack"
+            "detail": "Move,Look,Jump,Walk,ToggleCamera,Crouch,Attack"
         },
         {
             "name": "4.2 Humanoid model, valid Avatar, Root Motion off",
@@ -19,7 +19,7 @@
             "detail": "human True, valid True, root motion False"
         },
         {
-            "name": "4.1 Hierarchy Player/Model + Player/CameraTarget (y 1.5)",
+            "name": "4.1 Hierarchy Player/Model + Player/CameraTarget (y 1.55)",
             "passed": true,
             "detail": ""
         },
@@ -44,9 +44,9 @@
             "detail": "layer 6, deoccluder mask 64"
         },
         {
-            "name": "7 Third-person camera: Orbital Follow 4 m, damping, Deoccluder radius 0.2",
+            "name": "7 Third-person camera as in the first commit: Orbital Follow 5.2 m, FOV 60, damping ~0.11, Deoccluder radius 0.25",
             "passed": true,
-            "detail": "radius 4, damping 0.2, cam radius 0.2"
+            "detail": "radius 5.2, damping 0.11, cam radius 0.25, fov 60, pitch range (-30.00, 70.00)"
         },
         {
             "name": "7 Main Camera has Cinemachine Brain",
@@ -81,57 +81,87 @@
         {
             "name": "6.1 Character turns toward movement",
             "passed": true,
-            "detail": "forward (0.73,0.00,0.68)"
+            "detail": "forward (0.72,0.00,0.70)"
         },
         {
-            "name": "11 T switches to world axes, HUD follows",
+            "name": "Camera: starts in third person, pitch 18, HUD shows the mode",
             "passed": true,
-            "detail": "move (0.00,0.00,1.00), camera fwd (1.00,0.00,0.05)"
+            "detail": "ThirdPerson, pitch 18.0"
         },
         {
-            "name": "11 T switches back to camera-relative",
+            "name": "Camera: HUD no longer has a move-mode line",
             "passed": true,
             "detail": ""
         },
         {
-            "name": "Camera: starts in third person",
+            "name": "Camera: third person sits where the first commit put it (5.2 m back, pitch 18, focus 1.55 m)",
             "passed": true,
-            "detail": "THIRD PERSON"
+            "detail": "camera (0.00,3.24,-18.95), expected (0.00,3.24,-18.95)"
         },
         {
-            "name": "Camera: V switches to wide angle with a blend",
+            "name": "Camera: mouse sensitivity 0.12 deg/px yaw, 0.1 deg/px pitch",
             "passed": true,
-            "detail": "wide True, blending True"
+            "detail": "yaw 12.0, pitch 8.0"
         },
         {
-            "name": "Camera: wide view is high and behind the player, pitched down",
+            "name": "Camera: pitch limited to -30..70 like the first commit",
             "passed": true,
-            "detail": "camera (0.00,10.08,-12.00), pitch 45"
+            "detail": "max 70.0, min -30.0"
         },
         {
-            "name": "Camera: switching does not move the player",
+            "name": "Camera: looks at 0.9 m while crouched",
+            "passed": true,
+            "detail": "focus 0.90 m"
+        },
+        {
+            "name": "Camera: T -> first person with a blend",
+            "passed": true,
+            "detail": "FirstPerson, blending True, eye (0.00,1.58,0.14)"
+        },
+        {
+            "name": "Camera: first person hides the model",
+            "passed": true,
+            "detail": "0 renderers still on"
+        },
+        {
+            "name": "Camera: switching never moves the player",
             "passed": true,
             "detail": "moved 0.000 m"
         },
         {
-            "name": "Camera: HUD shows the mode",
+            "name": "Camera: W walks along the first-person view",
+            "passed": true,
+            "detail": "moved (0.00,0.00,2.50)"
+        },
+        {
+            "name": "Camera: T -> top down as in the first commit (14 m up, 5 m behind, pitch 70)",
+            "passed": true,
+            "detail": "TopDown, camera (0.00,14.08,-2.50), pitch 70"
+        },
+        {
+            "name": "Camera: top down shows the model again",
             "passed": true,
             "detail": ""
         },
         {
-            "name": "Camera: W still walks away from the camera in wide view",
+            "name": "Camera: W walks away from the top-down camera (+Z)",
             "passed": true,
-            "detail": "moved (0.00,0.00,3.00)"
+            "detail": "moved (0.00,0.00,2.50)"
         },
         {
-            "name": "Camera: V returns to third person",
+            "name": "Camera: T -> back to third person",
             "passed": true,
-            "detail": "distance 4.0"
+            "detail": "ThirdPerson, distance 5.20"
         },
         {
-            "name": "Camera: R returns to third person",
+            "name": "Camera: R returns to third person and shows the model",
             "passed": true,
-            "detail": "THIRD PERSON"
+            "detail": "ThirdPerson"
+        },
+        {
+            "name": "Camera: V no longer does anything",
+            "passed": true,
+            "detail": "ThirdPerson"
         },
         {
             "name": "11 Holding Space jumps once",
@@ -201,7 +231,7 @@
         {
             "name": "11 Camera moves closer when a wall is in the way",
             "passed": true,
-            "detail": "raw blocked True, camera (-0.75,1.78,14.00), distance 0.78"
+            "detail": "raw blocked True, camera (-0.70,1.86,14.00), distance 0.74"
         },
         {
             "name": "8 Idle: Speed 0, Locomotion",
@@ -301,7 +331,7 @@
         {
             "name": "Crouch: camera clear of the beam",
             "passed": true,
-            "detail": "camera (-6.00,1.16,-6.10)"
+            "detail": "camera (-6.00,1.15,-6.14)"
         },
         {
             "name": "Crouch: stands up after leaving the beam",
@@ -316,7 +346,7 @@
         {
             "name": "Attack: arm swings",
             "passed": true,
-            "detail": "114 deg"
+            "detail": "115 deg"
         },
         {
             "name": "Attack: Animation Events open the hitbox, dummy -25 once",
@@ -374,14 +404,14 @@
             "detail": "yaw 0 -> 80"
         },
         {
-            "name": "9 R resets position, state, move mode, dummy",
+            "name": "9 R resets position, state, dummy",
             "passed": true,
             "detail": "pos (0.00,0.08,0.00), state Idle, dummy 100"
         },
         {
-            "name": "6.4 HUD lines State/Speed/Grounded/VelocityY/Move mode",
+            "name": "6.4 HUD lines State/Speed/Grounded/VelocityY/Camera",
             "passed": true,
-            "detail": "State: Idle | Speed: 0.0 m/s | Grounded: True | VelocityY: -2.3 | Move mode: Camera-relative | Camera: THIRD PERSON | Crouched: False   Hitbox: closed"
+            "detail": "State: Idle | Speed: 0.0 m/s | Grounded: True | VelocityY: -2.3 | Camera: THIRD PERSON | Crouched: False   Hitbox: closed"
         },
         {
             "name": "6.4 HUD font readable on screen share",
@@ -396,7 +426,7 @@
         {
             "name": "FSM visited Idle/Move/Jump/Fall/Crouch/Attack",
             "passed": true,
-            "detail": "Idle,Move,Jump,Fall,Crouch,Attack"
+            "detail": "Idle,Move,Crouch,Jump,Fall,Attack"
         }
     ]
 }
