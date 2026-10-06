@@ -94,7 +94,7 @@ public static class DemoSceneBuilder {
   mainCam.gameObject.AddComponent<AudioListener>(); mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = true;
   mainCam.transform.position = new Vector3(0, 2.5f, -4);
   var cmBrain = mainCam.gameObject.AddComponent<CinemachineBrain>(); cmBrain.DefaultBlend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Styles.EaseInOut, .5f);
-  var vcam = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>(); vcam.Follow = cameraTarget; // Tracking Target vcam.Lens.FieldOfView = 55; vcam.Lens.NearClipPlane = .1f;
+  var vcam = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>(); vcam.Follow = cameraTarget; vcam.Lens.FieldOfView = 55; vcam.Lens.NearClipPlane = .1f; vcam.Priority = 20; // Tracking Target = CameraTarget
   var orbit = vcam.gameObject.AddComponent<CinemachineOrbitalFollow>(); orbit.OrbitStyle = CinemachineOrbitalFollow.OrbitStyles.Sphere; orbit.Radius = 4;
   var tracker = orbit.TrackerSettings; tracker.BindingMode = BindingMode.WorldSpace; tracker.PositionDamping = new Vector3(.2f, .2f, .2f); orbit.TrackerSettings = tracker;
   var h = orbit.HorizontalAxis; h.Range = new Vector2(-180, 180); h.Wrap = true; h.Value = 0; orbit.HorizontalAxis = h;
@@ -103,13 +103,16 @@ public static class DemoSceneBuilder {
   var deoccluder = vcam.gameObject.AddComponent<CinemachineDeoccluder>(); deoccluder.CollideAgainst = 1 << Environment; deoccluder.IgnoreTag = "Player"; deoccluder.MinimumDistanceFromTarget = .3f;
   var avoid = deoccluder.AvoidObstacles; avoid.Enabled = true; avoid.CameraRadius = .2f; avoid.Strategy = CinemachineDeoccluder.ObstacleAvoidance.ResolutionStrategy.PullCameraForward; avoid.Damping = .2f; avoid.DampingWhenOccluded = 0; deoccluder.AvoidObstacles = avoid;
   var orbitInput = vcam.gameObject.AddComponent<CameraOrbitInput>(); orbitInput.playerInput = input;
+  // Wide-angle camera (V): no procedural components, CameraModeSwitcher drives its transform.
+  var wideCam = new GameObject("CM Wide Angle").AddComponent<CinemachineCamera>(); wideCam.Lens.FieldOfView = 55; wideCam.Lens.NearClipPlane = .1f; wideCam.Priority = 0;
+  var cameraMode = new GameObject("Camera Mode").AddComponent<CameraModeSwitcher>(); cameraMode.playerInput = input; cameraMode.player = player.transform; cameraMode.thirdPerson = vcam; cameraMode.wide = wideCam;
 
   // ---- Sections 5 + 6.4: HUD, on-screen joystick and jump button. ----
-  var hud = Ui(controller, states, combat);
+  var hud = Ui(controller, states, combat, cameraMode);
   new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
 
   var demo = new GameObject("Demo Controller").AddComponent<DemoController>();
-  demo.player = controller; demo.states = states; demo.animatorBridge = bridge; demo.cameraInput = orbitInput; demo.hud = hud;
+  demo.player = controller; demo.states = states; demo.animatorBridge = bridge; demo.cameraInput = orbitInput; demo.cameraMode = cameraMode; demo.hud = hud;
 
   var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(Root + "/Art/ArenaVolume.asset");
   if (profile) { var vol = new GameObject("Global Volume").AddComponent<Volume>(); vol.isGlobal = true; vol.sharedProfile = profile; }
@@ -173,6 +176,7 @@ public static class DemoSceneBuilder {
   map.AddAction("Jump", InputActionType.Button, "<Keyboard>/space").AddBinding("<Gamepad>/buttonSouth"); // also the On-Screen Button
   map.AddAction("Walk", InputActionType.Button, "<Keyboard>/leftCtrl");
   map.AddAction("ToggleWorldMove", InputActionType.Button, "<Keyboard>/t");
+  map.AddAction("ToggleCamera", InputActionType.Button, "<Keyboard>/v");
   map.AddAction("Crouch", InputActionType.Button, "<Keyboard>/c");
   map.AddAction("Attack", InputActionType.Button, "<Mouse>/leftButton");
   string path = Root + "/Input/PlayerControls.inputactions"; File.WriteAllText(path, asset.ToJson()); Object.DestroyImmediate(asset);
@@ -180,7 +184,7 @@ public static class DemoSceneBuilder {
  }
 
  // ---------- UI ----------
- static DebugHUD Ui(PlayerController player, PlayerStateMachine states, PlayerCombat combat) {
+ static DebugHUD Ui(PlayerController player, PlayerStateMachine states, PlayerCombat combat, CameraModeSwitcher cameraMode) {
   var go = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
   go.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
   var scaler = go.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920, 1080); scaler.matchWidthOrHeight = .5f;
@@ -199,7 +203,7 @@ public static class DemoSceneBuilder {
   jump.gameObject.AddComponent<OnScreenButton>().controlPath = "<Gamepad>/buttonSouth";
   var jt = Text(jump.transform, "Label", new Vector2(.5f, .5f), Vector2.zero, new Vector2(180, 60), 30); jt.text = "JUMP"; jt.alignment = TextAlignmentOptions.Center;
 
-  var hud = go.AddComponent<DebugHUD>(); hud.player = player; hud.states = states; hud.combat = combat;
+  var hud = go.AddComponent<DebugHUD>(); hud.player = player; hud.states = states; hud.combat = combat; hud.cameraMode = cameraMode;
   hud.status = Text(go.transform, "DebugHUD", new Vector2(0, 1), new Vector2(30, -26), new Vector2(760, 330), 34);
   hud.help = Text(go.transform, "Controls", new Vector2(.5f, 0), new Vector2(0, 26), new Vector2(1500, 70), 19); hud.help.alignment = TextAlignmentOptions.Bottom;
   return hud;

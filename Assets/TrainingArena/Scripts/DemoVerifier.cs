@@ -92,7 +92,7 @@ public sealed class DemoVerifier : MonoBehaviour {
         dummy = FindAnyObjectByType<Health>(); spawn = player.spawn;
         if (PlayerController.IgnoreCursorLock) Debug.Log("VERIFY NOTE cursor cannot lock in batchmode; mouse look/attack read without the lock gate");
 
-        foreach (var test in new Func<IEnumerator>[] { Setup, CameraRelative, WorldMode, Jumping, Ledge, Stairs, StepAndSlopes, Corridor,
+        foreach (var test in new Func<IEnumerator>[] { Setup, CameraRelative, WorldMode, CameraAngle, Jumping, Ledge, Stairs, StepAndSlopes, Corridor,
                                                       BlendTree, StateNames, HumanoidMotion, AnimatorOff, Crouch, Attack, Joystick, ResetAndHud })
             yield return Run(test);
         Check("FSM visited Idle/Move/Jump/Fall/Crouch/Attack", new[] { "Idle", "Move", "Jump", "Fall", "Crouch", "Attack" }.All(seenStates.Contains), string.Join(",", seenStates));
@@ -124,7 +124,7 @@ public sealed class DemoVerifier : MonoBehaviour {
               && Mathf.Approximately(cc.stepOffset, .3f) && Mathf.Approximately(cc.slopeLimit, 45) && Mathf.Approximately(cc.skinWidth, .08f),
               $"h {cc.height} r {cc.radius} c {cc.center} step {cc.stepOffset} slope {cc.slopeLimit} skin {cc.skinWidth}");
         var pi = player.GetComponent<PlayerInput>();
-        Check("5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove", pi && new[] { "Move", "Look", "Jump", "Walk", "ToggleWorldMove" }.All(a => pi.actions.FindAction(a) != null),
+        Check("5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove", pi && new[] { "Move", "Look", "Jump", "Walk", "ToggleWorldMove", "ToggleCamera" }.All(a => pi.actions.FindAction(a) != null),
               pi ? string.Join(",", pi.actions.Select(a => a.name)) : "missing");
         Check("4.2 Humanoid model, valid Avatar, Root Motion off", animator.isHuman && animator.avatar.isValid && !animator.applyRootMotion,
               $"human {animator.isHuman}, valid {animator.avatar.isValid}, root motion {animator.applyRootMotion}");
@@ -177,6 +177,29 @@ public sealed class DemoVerifier : MonoBehaviour {
         Check("11 T switches to world axes, HUD follows", !player.moveRelativeToCamera && hudWorld && Vector3.Dot(moved, Vector3.forward) > .95f, $"move {V(moved)}, camera fwd {V(CamForward)}");
         yield return Tap(Key.T);
         Check("11 T switches back to camera-relative", player.moveRelativeToCamera && hud.status.text.Contains("Move mode: Camera-relative"), "");
+    }
+
+    // V toggles third person <-> wide angle (blend, player untouched, R returns to third person).
+    IEnumerator CameraAngle() {
+        yield return ResetDemo();
+        var cm = FindAnyObjectByType<CameraModeSwitcher>(); var brain = Camera.main.GetComponent<CinemachineBrain>();
+        Vector3 before = Pos;
+        Check("Camera: starts in third person", !cm.Wide && hud.status.text.Contains("Camera: THIRD PERSON") && cm.thirdPerson.Priority > cm.wide.Priority, cm.ModeName);
+        yield return Tap(Key.V);
+        bool blending = false; for (int i = 0; i < 12; i++) { blending |= brain.IsBlending; yield return null; }
+        yield return Wait(1f);
+        Vector3 cam = Camera.main.transform.position; float pitch = Mathf.DeltaAngle(0, Camera.main.transform.eulerAngles.x);
+        Shot("16-wide-angle");
+        Check("Camera: V switches to wide angle with a blend", cm.Wide && blending && cm.wide.Priority > cm.thirdPerson.Priority, $"wide {cm.Wide}, blending {blending}");
+        Check("Camera: wide view is high and behind the player, pitched down", Mathf.Abs(cam.y - (Pos.y + 10)) < .5f && cam.z < Pos.z - 10 && Mathf.Abs(pitch - 45) < 3, $"camera {V(cam)}, pitch {pitch:0}");
+        Check("Camera: switching does not move the player", Vector3.Distance(before, Pos) < .01f, $"moved {Vector3.Distance(before, Pos):0.000} m");
+        Check("Camera: HUD shows the mode", hud.status.text.Contains("Camera: WIDE ANGLE"), "");
+        Vector3 start = Pos; Keys(Key.W); yield return Wait(.6f); Keys();
+        Check("Camera: W still walks away from the camera in wide view", Vector3.Dot(Flat(Pos - start).normalized, Vector3.forward) > .95f, $"moved {V(Pos - start)}");
+        yield return Tap(Key.V); yield return Wait(1.2f);
+        Check("Camera: V returns to third person", !cm.Wide && Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position) < 5, $"distance {Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position):0.0}");
+        yield return Tap(Key.V); yield return Wait(.3f); yield return ResetDemo();
+        Check("Camera: R returns to third person", !cm.Wide && hud.status.text.Contains("THIRD PERSON"), cm.ModeName);
     }
 
     IEnumerator Jumping() {

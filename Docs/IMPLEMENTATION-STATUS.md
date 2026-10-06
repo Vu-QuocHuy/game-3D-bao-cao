@@ -10,6 +10,6 @@
 | 7 Camera | Brain, CinemachineCamera Orbital Follow 4 m, damping, Deoccluder layer Environment radius 0,2, khóa con trỏ + Esc |
 | 8 Animator | Speed/IsGrounded/Jump, Locomotion Blend Tree 0/0,5/1, Jump, Fall, Root Motion tắt |
 | 9 Chức năng demo | T, tắt Animator khi Play, HUD State, R |
-| 12 Mở rộng | Animation Event (Footstep, hitbox); state Attack và Crouch thêm mà không sửa state gốc. Chưa làm: Rigidbody so sánh, APK |
+| 12 Mở rộng | Animation Event (Footstep, hitbox); state Attack và Crouch thêm mà không sửa state gốc; góc rộng (V) khôi phục từ bản trước. Chưa làm: Rigidbody so sánh, APK |
 
 Khác biệt có chủ đích: crouch dùng phím **C** vì Ctrl là Walk theo đặc tả. Jump → Fall dùng exit time ngắn vì `IsGrounded` đã false ngay khi bật nhảy (đặc tả cho phép).

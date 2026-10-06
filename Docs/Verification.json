@@ -1,6 +1,6 @@
 {
     "scene": "TrainingArena",
-    "passed": 71,
+    "passed": 79,
     "failed": 0,
     "checks": [
         {
@@ -11,7 +11,7 @@
         {
             "name": "5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove",
             "passed": true,
-            "detail": "Move,Look,Jump,Walk,ToggleWorldMove,Crouch,Attack"
+            "detail": "Move,Look,Jump,Walk,ToggleWorldMove,ToggleCamera,Crouch,Attack"
         },
         {
             "name": "4.2 Humanoid model, valid Avatar, Root Motion off",
@@ -92,6 +92,46 @@
             "name": "11 T switches back to camera-relative",
             "passed": true,
             "detail": ""
+        },
+        {
+            "name": "Camera: starts in third person",
+            "passed": true,
+            "detail": "THIRD PERSON"
+        },
+        {
+            "name": "Camera: V switches to wide angle with a blend",
+            "passed": true,
+            "detail": "wide True, blending True"
+        },
+        {
+            "name": "Camera: wide view is high and behind the player, pitched down",
+            "passed": true,
+            "detail": "camera (0.00,10.08,-12.00), pitch 45"
+        },
+        {
+            "name": "Camera: switching does not move the player",
+            "passed": true,
+            "detail": "moved 0.000 m"
+        },
+        {
+            "name": "Camera: HUD shows the mode",
+            "passed": true,
+            "detail": ""
+        },
+        {
+            "name": "Camera: W still walks away from the camera in wide view",
+            "passed": true,
+            "detail": "moved (0.00,0.00,3.00)"
+        },
+        {
+            "name": "Camera: V returns to third person",
+            "passed": true,
+            "detail": "distance 4.0"
+        },
+        {
+            "name": "Camera: R returns to third person",
+            "passed": true,
+            "detail": "THIRD PERSON"
         },
         {
             "name": "11 Holding Space jumps once",
@@ -276,7 +316,7 @@
         {
             "name": "Attack: arm swings",
             "passed": true,
-            "detail": "115 deg"
+            "detail": "114 deg"
         },
         {
             "name": "Attack: Animation Events open the hitbox, dummy -25 once",
@@ -341,7 +381,7 @@
         {
             "name": "6.4 HUD lines State/Speed/Grounded/VelocityY/Move mode",
             "passed": true,
-            "detail": "State: Idle | Speed: 0.0 m/s | Grounded: True | VelocityY: -2.3 | Move mode: Camera-relative | Crouched: False   Hitbox: closed"
+            "detail": "State: Idle | Speed: 0.0 m/s | Grounded: True | VelocityY: -2.3 | Move mode: Camera-relative | Camera: THIRD PERSON | Crouched: False   Hitbox: closed"
         },
         {
             "name": "6.4 HUD font readable on screen share",
