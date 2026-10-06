@@ -8,7 +8,7 @@ package "Player" {
   [Player Input\n(PlayerControls.inputactions)] as Input
   [PlayerController] as Controller
   [CharacterController\nStep Offset 0.3 · Slope Limit 45] as CC
-  [CameraTarget\n(y = 1.5)] as Target
+  [CameraTarget\n(y = 1.55)] as Target
 }
 
 package "Canvas (cảm ứng)" {
@@ -19,32 +19,34 @@ package "Canvas (cảm ứng)" {
 
 package "Camera" {
   [Main Camera\nCinemachine Brain] as Brain
-  [CinemachineCamera\nOrbital Follow 4 m] as VCam
+  [CinemachineCamera\nOrbital Follow 5.2 m · FOV 60] as VCam
   [CameraOrbitInput] as OrbitInput
-  [CameraModeSwitcher\n(V: đổi Priority)] as Mode
-  [CM Wide Angle\n+10 m cao · −12 m sau · 45°] as Wide
+  [CameraModeSwitcher\n(T: đổi Priority)] as Mode
+  [CM First Person\ntầm mắt, ẩn model] as FPS
+  [CM Top Down\n+14 m cao · −5 m sau · 70°] as Top
   [Cinemachine Deoccluder\nlayer Environment, radius 0.2] as Deocc
 }
 
 Stick ..> Input : Move
 JumpBtn ..> Input : Jump
 LookArea ..> Input : Look
-Input --> Controller : Move, Jump, Walk,\nToggleWorldMove (T)
+Input --> Controller : Move, Jump, Walk
 Input --> OrbitInput : Look
 OrbitInput --> VCam : xoay trục ngang / dọc
 VCam --> Target : Tracking Target
 VCam --> Deocc
 Brain --> VCam : chọn camera đang live
-Input --> Mode : ToggleCamera (V)
+Input --> Mode : ToggleCamera (T)
 Mode --> VCam : Priority 20 / 0
-Mode --> Wide : Priority 0 / 20,\nđặt vị trí theo người chơi
-Brain --> Wide : blend 0.5 s
+Mode --> FPS : đặt vị trí mắt
+Mode --> Top : đặt vị trí trên cao
+Brain --> FPS : blend 0.5 s
+Brain --> Top : blend 0.5 s
 Brain ..> Controller : forward / right của camera\n(bỏ y, chuẩn hoá)
 Controller --> CC : Move((dir * speed + up * velocityY) * dt)\nđúng 1 lần mỗi khung hình
 
 note right of Controller
   * dir = f * input.y + r * input.x
-  * T: theo camera <-> theo trục thế giới
   * speed: chạy 5 m/s, giữ Ctrl đi 2 m/s
   * gravity -20; chạm đất giữ velocityY = -2
   * Nhảy chỉ khi isGrounded: v = sqrt(1.2 * -2 * gravity)
@@ -119,7 +121,7 @@ SM -> SM : luật mở rộng (Attack / Crouch)\nrồi Current.Tick()
 SM -> AN : SetTrigger("Jump" / "Attack"),\nSetBool("IsGrounded", false) khi vào Fall
 AB -> AN : SetFloat("Speed", 0..1, damp 0.1)\nSetBool("IsGrounded"), SetBool("Crouch")\nLayer weight Upper Body
 HUD -> SM : State
-HUD -> PC : Speed, Grounded, VelocityY, Move mode
+HUD -> PC : Speed, Grounded, VelocityY, Camera
 @enduml
 
 @startuml ThuNam_Animator_Controller

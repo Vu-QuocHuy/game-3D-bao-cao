@@ -14,8 +14,7 @@ Game mô phỏng 3D cho hai buổi báo cáo: **Thứ Ba: điều khiển nhân 
 | Giữ Ctrl / đẩy joystick nhẹ | Đi bộ 2 m/s |
 | Chuột / kéo nửa phải màn hình | Xoay camera |
 | Space / nút JUMP | Nhảy (chỉ khi chạm đất) |
-| T | Đổi hướng đi: theo camera ↔ theo trục thế giới |
-| V | Đổi góc nhìn: third person ↔ góc rộng (nhìn từ trên cao phía sau, có blend) |
+| T | Đổi góc camera: third person → first person → top-down (giống commit đầu tiên) |
 | C | Khom (mở rộng), tự giữ thấp nếu có trần |
 | Chuột trái | Attack (mở rộng), chỉ khi chạm đất |
 | R | Về điểm xuất phát |
@@ -35,7 +34,7 @@ Xuất phát ở giữa, nhìn về phía +Z. Trái: bậc thang 5 × 0,2 m dẫ
 | `PlayerStateMachine` | Chạy FSM sau `PlayerController` (Script Execution Order 10) |
 | `AnimatorBridge` | Ghi `Speed` (0–1), `IsGrounded`, `Crouch` vào Animator; nhận Animation Event |
 | `CameraOrbitInput` | Đưa action `Look` vào Cinemachine Orbital Follow |
-| `CameraModeSwitcher` | V đổi Priority giữa CinemachineCamera third person và `CM Wide Angle` (cao 10 m, sau 12 m, nghiêng 45°); không di chuyển nhân vật |
+| `CameraModeSwitcher` | T xoay vòng Priority giữa CinemachineCamera third person, `CM First Person` (tầm mắt, ẩn model) và `CM Top Down` (cao 14 m, lùi 5 m, nghiêng 70°); không di chuyển nhân vật |
 | `PlayerCombat` | Attack: Animation Event mở/đóng hitbox, C# giữ cooldown |
 | `DebugHUD`, `DemoController` | HUD góc trên trái; R / F1 / Esc |
 

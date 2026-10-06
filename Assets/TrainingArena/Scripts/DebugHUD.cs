@@ -13,8 +13,8 @@ public sealed class DebugHUD : MonoBehaviour {
     public bool Visible => !status || status.gameObject.activeSelf;
 
     void Start() {
-        if (help) help.text = "WASD / JOYSTICK  MOVE   |   MOUSE / DRAG RIGHT  LOOK   |   SPACE  JUMP   |   CTRL  WALK   |   C  CROUCH   |   V  CAMERA ANGLE   |   LMB  ATTACK\n" +
-                              "T  CAMERA / WORLD MOVE   |   R  RESET   |   F1  HUD   |   ESC  FREE CURSOR, CLICK TO LOCK";
+        if (help) help.text = "WASD / JOYSTICK  MOVE   |   MOUSE / DRAG RIGHT  LOOK   |   SPACE  JUMP   |   CTRL  WALK   |   C  CROUCH   |   LMB  ATTACK\n" +
+                              "T  CAMERA: THIRD PERSON / FIRST PERSON / TOP DOWN   |   R  RESET   |   F1  HUD   |   ESC  FREE CURSOR, CLICK TO LOCK";
     }
 
     public void Toggle() {
@@ -32,7 +32,6 @@ public sealed class DebugHUD : MonoBehaviour {
             $"Speed: {player.HorizontalSpeed:0.0} m/s\n" +
             $"Grounded: {player.IsGrounded}\n" +
             $"VelocityY: {player.VelocityY:0.0}\n" +
-            $"Move mode: {(player.moveRelativeToCamera ? "Camera-relative" : "World axes")}\n" +
             $"Camera: {(cameraMode ? cameraMode.ModeName : "-")}\n" +
             $"Crouched: {player.Crouched}   Hitbox: {(combat && combat.WindowOpen ? "OPEN" : "closed")}";
         if (!string.IsNullOrEmpty(player.BlockReason)) text += $"\n<color=#ff6070>{player.BlockReason}</color>";

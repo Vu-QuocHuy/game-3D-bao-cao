@@ -7,8 +7,6 @@ namespace TrainingArena {
 public sealed class PlayerController : MonoBehaviour {
     [Header("Movement")]
     public float runSpeed = 5, walkSpeed = 2, crouchSpeed = 1.6f, gravity = -20, jumpHeight = 1.2f, turnSpeed = 720;
-    [Tooltip("T toggles: camera-relative vs world axes (demo only)")]
-    public bool moveRelativeToCamera = true;
     public Transform cameraTarget, spawn;
     public LayerMask groundMask = 1 << 6; // Environment
 
@@ -28,7 +26,7 @@ public sealed class PlayerController : MonoBehaviour {
     CharacterController controller;
     PlayerCombat combat;
     Camera view;
-    InputAction move, jump, walk, toggleWorldMove, crouch, attack;
+    InputAction move, jump, walk, crouch, attack;
     float standingHeight, standingStep, blockUntil;
     Vector3 standingCenter;
     string blockReason = "";
@@ -38,7 +36,7 @@ public sealed class PlayerController : MonoBehaviour {
         combat = GetComponent<PlayerCombat>();
         var actions = GetComponent<PlayerInput>().actions;
         move = actions["Move"]; jump = actions["Jump"]; walk = actions["Walk"];
-        toggleWorldMove = actions["ToggleWorldMove"]; crouch = actions["Crouch"]; attack = actions["Attack"];
+        crouch = actions["Crouch"]; attack = actions["Attack"];
         standingHeight = controller.height; standingCenter = controller.center; standingStep = controller.stepOffset;
         view = Camera.main;
     }
@@ -52,13 +50,12 @@ public sealed class PlayerController : MonoBehaviour {
         JumpPressed = jump.WasPressedThisFrame();
         Walking = walk.IsPressed();
         Jumped = AttackStarted = false;
-        if (toggleWorldMove.WasPressedThisFrame()) moveRelativeToCamera = !moveRelativeToCamera;
 
         SetCrouch(crouch.IsPressed() && IsGrounded);
 
-        // Camera-relative: camera forward/right flattened onto the ground. World mode: fixed +Z/+X.
+        // Camera-relative: camera forward/right flattened onto the ground.
         Vector3 forward = Vector3.forward, right = Vector3.right;
-        if (moveRelativeToCamera && view) {
+        if (view) {
             forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up);
             right = Vector3.ProjectOnPlane(view.transform.right, Vector3.up);
             if (forward.sqrMagnitude < .001f) forward = Vector3.ProjectOnPlane(view.transform.up, Vector3.up);
@@ -97,7 +94,7 @@ public sealed class PlayerController : MonoBehaviour {
         // Camera looks at the head; drop it when crouched so it never sits inside the crouch beam.
         if (cameraTarget) {
             var p = cameraTarget.localPosition;
-            p.y = Mathf.Lerp(p.y, Crouched ? .95f : 1.5f, 1 - Mathf.Exp(-10 * dt));
+            p.y = Mathf.Lerp(p.y, Crouched ? .9f : 1.55f, 1 - Mathf.Exp(-10 * dt));
             cameraTarget.localPosition = p;
         }
     }
@@ -120,10 +117,9 @@ public sealed class PlayerController : MonoBehaviour {
         transform.SetPositionAndRotation(position, rotation);
         controller.enabled = true;
         SetCrouch(false);
-        moveRelativeToCamera = true;
         VelocityY = 0; HorizontalSpeed = 0; blockUntil = 0;
         IsGrounded = (controller.Move(Vector3.down * .2f) & CollisionFlags.Below) != 0;
-        if (cameraTarget) cameraTarget.localPosition = new Vector3(0, 1.5f, 0);
+        if (cameraTarget) cameraTarget.localPosition = new Vector3(0, 1.55f, 0);
     }
 }
 }

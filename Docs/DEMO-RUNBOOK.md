@@ -3,11 +3,11 @@
 ## Thứ Ba: điều khiển và camera (~2:10)
 
 1. Chỉ Inspector của **Player**: Character Controller, Player Input, PlayerController, PlayerStateMachine. Bật Gizmos để thấy viên nang.
-2. **Sân rộng:** W đi về phía trước màn hình; xoay chuột, W vẫn đi theo camera. Nhấn **T**: HUD đổi `Move mode: World axes`, W luôn đi +Z dù camera quay đâu. T lần nữa để quay lại.
+2. **Sân rộng:** W đi về phía trước màn hình; xoay chuột, W vẫn đi theo camera.
 3. **Bục cao:** lên bậc thang bên trái (bậc 0,2 m < Step Offset 0,3), nhảy lên bục 1,5 m, bước ra mép: rơi, `Grounded: False`, VelocityY âm dần.
 4. **Bậc 0,6 m** bên phải: bị chặn. **Dốc 30°**: leo được. **Dốc 60°**: bị chặn (Slope Limit 45).
 5. **Hành lang tường:** đứng giữa hành lang, xoay camera về phía tường: camera tiến sát nhân vật thay vì xuyên tường (Deoccluder).
-6. **Góc rộng:** đứng yên, nhấn **V**: camera blend lên cao phía sau, thấy cả bậc thang, dốc, bục và hành lang cùng lúc; nhân vật không dịch chuyển. V lần nữa về third person (R cũng về third person).
+6. **Đổi góc camera:** đứng yên, nhấn **T**: third person → first person (ẩn model) → top-down (thấy cả khu thử nghiệm) → third person; có blend, nhân vật không dịch chuyển. R luôn về third person.
 7. **Joystick ảo:** Game view → Simulator, kéo joystick trái, nhấn JUMP, kéo nửa phải để xoay camera.
 
 ## Thứ Năm: trạng thái và animation (~2:00)

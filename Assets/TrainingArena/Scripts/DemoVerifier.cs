@@ -92,7 +92,7 @@ public sealed class DemoVerifier : MonoBehaviour {
         dummy = FindAnyObjectByType<Health>(); spawn = player.spawn;
         if (PlayerController.IgnoreCursorLock) Debug.Log("VERIFY NOTE cursor cannot lock in batchmode; mouse look/attack read without the lock gate");
 
-        foreach (var test in new Func<IEnumerator>[] { Setup, CameraRelative, WorldMode, CameraAngle, Jumping, Ledge, Stairs, StepAndSlopes, Corridor,
+        foreach (var test in new Func<IEnumerator>[] { Setup, CameraRelative, CameraModes, Jumping, Ledge, Stairs, StepAndSlopes, Corridor,
                                                       BlendTree, StateNames, HumanoidMotion, AnimatorOff, Crouch, Attack, Joystick, ResetAndHud })
             yield return Run(test);
         Check("FSM visited Idle/Move/Jump/Fall/Crouch/Attack", new[] { "Idle", "Move", "Jump", "Fall", "Crouch", "Attack" }.All(seenStates.Contains), string.Join(",", seenStates));
@@ -124,12 +124,13 @@ public sealed class DemoVerifier : MonoBehaviour {
               && Mathf.Approximately(cc.stepOffset, .3f) && Mathf.Approximately(cc.slopeLimit, 45) && Mathf.Approximately(cc.skinWidth, .08f),
               $"h {cc.height} r {cc.radius} c {cc.center} step {cc.stepOffset} slope {cc.slopeLimit} skin {cc.skinWidth}");
         var pi = player.GetComponent<PlayerInput>();
-        Check("5 Player Input with Move/Look/Jump/Walk/ToggleWorldMove", pi && new[] { "Move", "Look", "Jump", "Walk", "ToggleWorldMove", "ToggleCamera" }.All(a => pi.actions.FindAction(a) != null),
+        Check("5 Player Input: Move/Look/Jump/Walk/ToggleCamera on T, no V, no world-move toggle", pi && new[] { "Move", "Look", "Jump", "Walk", "ToggleCamera" }.All(a => pi.actions.FindAction(a) != null)
+              && pi.actions["ToggleCamera"].bindings.Any(b => b.path == "<Keyboard>/t") && !pi.actions["ToggleCamera"].bindings.Any(b => b.path == "<Keyboard>/v") && pi.actions.FindAction("ToggleWorldMove") == null,
               pi ? string.Join(",", pi.actions.Select(a => a.name)) : "missing");
         Check("4.2 Humanoid model, valid Avatar, Root Motion off", animator.isHuman && animator.avatar.isValid && !animator.applyRootMotion,
               $"human {animator.isHuman}, valid {animator.avatar.isValid}, root motion {animator.applyRootMotion}");
-        Check("4.1 Hierarchy Player/Model + Player/CameraTarget (y 1.5)", animator.transform.parent == player.transform && animator.name == "Model"
-              && player.cameraTarget && player.cameraTarget.parent == player.transform && Mathf.Abs(player.cameraTarget.localPosition.y - 1.5f) < .01f, "");
+        Check("4.1 Hierarchy Player/Model + Player/CameraTarget (y 1.55)", animator.transform.parent == player.transform && animator.name == "Model"
+              && player.cameraTarget && player.cameraTarget.parent == player.transform && Mathf.Abs(player.cameraTarget.localPosition.y - 1.55f) < .01f, "");
         var loops = animator.runtimeAnimatorController.animationClips.GroupBy(c => c.name).ToDictionary(g => g.Key, g => g.First().isLooping);
         Check("4.2 Clips Idle/Walk/Run/Fall loop, Jump does not", new[] { "Idle", "Walk", "Run", "Fall" }.All(n => loops.TryGetValue(n, out var l) && l) && loops.TryGetValue("Jump", out var j) && !j,
               string.Join(",", loops.Select(kv => kv.Key + ":" + kv.Value)));
@@ -139,9 +140,10 @@ public sealed class DemoVerifier : MonoBehaviour {
         int env = LayerMask.NameToLayer("Environment");
         Check("3 Environment layer used by ground and Deoccluder", env >= 0 && GameObject.Find("Floor 40x40").layer == env && deoccluder.CollideAgainst == 1 << env && player.groundMask == 1 << env,
               $"layer {env}, deoccluder mask {deoccluder.CollideAgainst.value}");
-        Check("7 Third-person camera: Orbital Follow 4 m, damping, Deoccluder radius 0.2", Mathf.Approximately(orbit.Radius, 4) && orbit.TrackerSettings.PositionDamping.x is >= .1f and <= .3f
-              && Mathf.Approximately(deoccluder.AvoidObstacles.CameraRadius, .2f) && orbit.GetComponent<CinemachineCamera>().Follow == player.cameraTarget,
-              $"radius {orbit.Radius}, damping {orbit.TrackerSettings.PositionDamping.x}, cam radius {deoccluder.AvoidObstacles.CameraRadius}");
+        Check("7 Third-person camera as in the first commit: Orbital Follow 5.2 m, FOV 60, damping ~0.11, Deoccluder radius 0.25", Mathf.Approximately(orbit.Radius, 5.2f) && Mathf.Abs(orbit.TrackerSettings.PositionDamping.x - .11f) < .02f
+              && Mathf.Approximately(deoccluder.AvoidObstacles.CameraRadius, .25f) && Mathf.Approximately(Camera.main.fieldOfView, 60) && orbit.GetComponent<CinemachineCamera>().Follow == player.cameraTarget
+              && Mathf.Approximately(orbit.VerticalAxis.Range.x, -30) && Mathf.Approximately(orbit.VerticalAxis.Range.y, 70),
+              $"radius {orbit.Radius}, damping {orbit.TrackerSettings.PositionDamping.x}, cam radius {deoccluder.AvoidObstacles.CameraRadius}, fov {Camera.main.fieldOfView}, pitch range {orbit.VerticalAxis.Range}");
         Check("7 Main Camera has Cinemachine Brain", Camera.main.GetComponent<CinemachineBrain>(), "");
         Check("3 Directional Light with shadows", FindObjectsByType<Light>(FindObjectsSortMode.None).Any(l => l.type == LightType.Directional && l.shadows != LightShadows.None), "");
     }
@@ -167,39 +169,56 @@ public sealed class DemoVerifier : MonoBehaviour {
         Check("6.1 Character turns toward movement", Vector3.Angle(player.transform.forward, (CamForward + Flat(Camera.main.transform.right).normalized).normalized) < 10, $"forward {V(player.transform.forward)}");
     }
 
-    IEnumerator WorldMode() {
-        yield return ResetDemo();
-        yield return Yaw(90);
-        yield return Tap(Key.T);
-        bool hudWorld = hud.status.text.Contains("Move mode: World axes");
-        Vector3 start = Pos; Keys(Key.W); yield return Wait(.6f); Keys();
-        Vector3 moved = Flat(Pos - start).normalized;
-        Check("11 T switches to world axes, HUD follows", !player.moveRelativeToCamera && hudWorld && Vector3.Dot(moved, Vector3.forward) > .95f, $"move {V(moved)}, camera fwd {V(CamForward)}");
-        yield return Tap(Key.T);
-        Check("11 T switches back to camera-relative", player.moveRelativeToCamera && hud.status.text.Contains("Move mode: Camera-relative"), "");
-    }
-
-    // V toggles third person <-> wide angle (blend, player untouched, R returns to third person).
-    IEnumerator CameraAngle() {
+    // Camera angles of the first commit: third person (5.2 m behind, pitch 18, look at 1.55 m), first person, top down.
+    // T cycles them; it no longer changes how the character moves.
+    IEnumerator CameraModes() {
         yield return ResetDemo();
         var cm = FindAnyObjectByType<CameraModeSwitcher>(); var brain = Camera.main.GetComponent<CinemachineBrain>();
+        var renderers = animator.GetComponentsInChildren<Renderer>();
+        Check("Camera: starts in third person, pitch 18, HUD shows the mode", cm.Mode == CameraMode.ThirdPerson && Mathf.Abs(orbit.VerticalAxis.Value - 18) < .1f && hud.status.text.Contains("Camera: THIRD PERSON"), $"{cm.Mode}, pitch {orbit.VerticalAxis.Value:0.0}");
+        Check("Camera: HUD no longer has a move-mode line", !hud.status.text.Contains("Move mode"), "");
+
+        yield return Place(new Vector3(0, 0, -14), 0); yield return Wait(.8f);
+        Vector3 focus = Pos + Vector3.up * 1.55f, expected = focus - Quaternion.Euler(18, 0, 0) * Vector3.forward * 5.2f;
+        Check("Camera: third person sits where the first commit put it (5.2 m back, pitch 18, focus 1.55 m)", Vector3.Distance(Camera.main.transform.position, expected) < .15f, $"camera {V(Camera.main.transform.position)}, expected {V(expected)}");
+        Look(new Vector2(100, 0)); yield return null; yield return null; float yaw = orbit.HorizontalAxis.Value;
+        Look(new Vector2(0, 100)); yield return null; yield return null; float pitch = orbit.VerticalAxis.Value;
+        Check("Camera: mouse sensitivity 0.12 deg/px yaw, 0.1 deg/px pitch", Mathf.Abs(yaw - 12) < .5f && Mathf.Abs(pitch - 8) < .5f, $"yaw {yaw:0.0}, pitch {pitch:0.0}");
+        Look(new Vector2(0, -20000)); yield return null; yield return null; float hi = orbit.VerticalAxis.Value;
+        Look(new Vector2(0, 20000)); yield return null; yield return null; float lo = orbit.VerticalAxis.Value;
+        Check("Camera: pitch limited to -30..70 like the first commit", Mathf.Abs(hi - 70) < .1f && Mathf.Abs(lo + 30) < .1f, $"max {hi:0.0}, min {lo:0.0}");
+        yield return ResetDemo();
+        Keys(Key.C); yield return Wait(.7f); Keys();
+        Check("Camera: looks at 0.9 m while crouched", Mathf.Abs(player.cameraTarget.position.y - Pos.y - .9f) < .06f, $"focus {player.cameraTarget.position.y - Pos.y:0.00} m");
+        yield return Wait(.5f);
+
+        yield return ResetDemo();
         Vector3 before = Pos;
-        Check("Camera: starts in third person", !cm.Wide && hud.status.text.Contains("Camera: THIRD PERSON") && cm.thirdPerson.Priority > cm.wide.Priority, cm.ModeName);
-        yield return Tap(Key.V);
+        yield return Tap(Key.T);
         bool blending = false; for (int i = 0; i < 12; i++) { blending |= brain.IsBlending; yield return null; }
         yield return Wait(1f);
-        Vector3 cam = Camera.main.transform.position; float pitch = Mathf.DeltaAngle(0, Camera.main.transform.eulerAngles.x);
-        Shot("16-wide-angle");
-        Check("Camera: V switches to wide angle with a blend", cm.Wide && blending && cm.wide.Priority > cm.thirdPerson.Priority, $"wide {cm.Wide}, blending {blending}");
-        Check("Camera: wide view is high and behind the player, pitched down", Mathf.Abs(cam.y - (Pos.y + 10)) < .5f && cam.z < Pos.z - 10 && Mathf.Abs(pitch - 45) < 3, $"camera {V(cam)}, pitch {pitch:0}");
-        Check("Camera: switching does not move the player", Vector3.Distance(before, Pos) < .01f, $"moved {Vector3.Distance(before, Pos):0.000} m");
-        Check("Camera: HUD shows the mode", hud.status.text.Contains("Camera: WIDE ANGLE"), "");
-        Vector3 start = Pos; Keys(Key.W); yield return Wait(.6f); Keys();
-        Check("Camera: W still walks away from the camera in wide view", Vector3.Dot(Flat(Pos - start).normalized, Vector3.forward) > .95f, $"moved {V(Pos - start)}");
-        yield return Tap(Key.V); yield return Wait(1.2f);
-        Check("Camera: V returns to third person", !cm.Wide && Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position) < 5, $"distance {Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position):0.0}");
-        yield return Tap(Key.V); yield return Wait(.3f); yield return ResetDemo();
-        Check("Camera: R returns to third person", !cm.Wide && hud.status.text.Contains("THIRD PERSON"), cm.ModeName);
+        Vector3 eye = Camera.main.transform.position; focus = Pos + Vector3.up * 1.55f;
+        Check("Camera: T -> first person with a blend", cm.Mode == CameraMode.FirstPerson && blending && Vector3.Distance(eye, focus) < .4f && hud.status.text.Contains("FIRST PERSON"), $"{cm.Mode}, blending {blending}, eye {V(eye)}");
+        Check("Camera: first person hides the model", renderers.Length > 0 && renderers.All(r => !r.enabled), $"{renderers.Count(r => r.enabled)} renderers still on");
+        Check("Camera: switching never moves the player", Vector3.Distance(before, Pos) < .01f, $"moved {Vector3.Distance(before, Pos):0.000} m");
+        Vector3 start = Pos; Keys(Key.W); yield return Wait(.5f); Keys();
+        Check("Camera: W walks along the first-person view", Vector3.Dot(Flat(Pos - start).normalized, CamForward) > .95f, $"moved {V(Pos - start)}");
+
+        yield return Tap(Key.T); yield return Wait(1.2f);
+        Vector3 top = Camera.main.transform.position; float topPitch = Mathf.DeltaAngle(0, Camera.main.transform.eulerAngles.x);
+        Shot("16-top-down");
+        Check("Camera: T -> top down as in the first commit (14 m up, 5 m behind, pitch 70)", cm.Mode == CameraMode.TopDown && Mathf.Abs(top.y - (Pos.y + 14)) < .5f && Mathf.Abs(top.z - (Pos.z - 5)) < .5f && Mathf.Abs(topPitch - 70) < 3 && hud.status.text.Contains("TOP DOWN"),
+              $"{cm.Mode}, camera {V(top)}, pitch {topPitch:0}");
+        Check("Camera: top down shows the model again", renderers.All(r => r.enabled), "");
+        start = Pos; Keys(Key.W); yield return Wait(.5f); Keys();
+        Check("Camera: W walks away from the top-down camera (+Z)", Vector3.Dot(Flat(Pos - start).normalized, Vector3.forward) > .95f, $"moved {V(Pos - start)}");
+
+        yield return Tap(Key.T); yield return Wait(1.2f);
+        Check("Camera: T -> back to third person", cm.Mode == CameraMode.ThirdPerson && Mathf.Abs(Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position) - 5.2f) < .3f, $"{cm.Mode}, distance {Vector3.Distance(Camera.main.transform.position, player.cameraTarget.position):0.00}");
+        yield return Tap(Key.T); yield return Tap(Key.T); yield return Wait(.3f); yield return ResetDemo();
+        Check("Camera: R returns to third person and shows the model", cm.Mode == CameraMode.ThirdPerson && renderers.All(r => r.enabled) && hud.status.text.Contains("THIRD PERSON"), $"{cm.Mode}");
+        yield return Tap(Key.V); yield return Wait(.3f);
+        Check("Camera: V no longer does anything", cm.Mode == CameraMode.ThirdPerson, $"{cm.Mode}");
     }
 
     IEnumerator Jumping() {
@@ -424,10 +443,10 @@ public sealed class DemoVerifier : MonoBehaviour {
         Keys(Key.W, Key.C); yield return Wait(.5f); Keys(); yield return Tap(Key.T);
         dummy.Damage(25);
         yield return ResetDemo();
-        Check("9 R resets position, state, move mode, dummy", Flat(Pos - spawn.position).magnitude < .1f && states.CurrentName == "Idle" && player.moveRelativeToCamera && !player.Crouched && dummy.Current == 100,
+        Check("9 R resets position, state, dummy", Flat(Pos - spawn.position).magnitude < .1f && states.CurrentName == "Idle" && !player.Crouched && dummy.Current == 100,
               $"pos {V(Pos)}, state {states.CurrentName}, dummy {dummy.Current}");
         string s = hud.status.text;
-        Check("6.4 HUD lines State/Speed/Grounded/VelocityY/Move mode", new[] { "State:", "Speed:", "Grounded:", "VelocityY:", "Move mode:" }.All(s.Contains), s.Replace("\n", " | "));
+        Check("6.4 HUD lines State/Speed/Grounded/VelocityY/Camera", new[] { "State:", "Speed:", "Grounded:", "VelocityY:", "Camera:" }.All(s.Contains), s.Replace("\n", " | "));
         Check("6.4 HUD font readable on screen share", hud.status.fontSize >= 28, $"font {hud.status.fontSize}");
         yield return Tap(Key.F1); bool hidden = !hud.Visible; yield return Tap(Key.F1);
         Check("6.4 F1 hides/shows the HUD", hidden && hud.Visible, "");
