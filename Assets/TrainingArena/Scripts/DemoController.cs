@@ -8,6 +8,7 @@ public sealed class DemoController : MonoBehaviour {
     public PlayerStateMachine states;
     public AnimatorBridge animatorBridge;
     public CameraOrbitInput cameraInput;
+    public CameraModeSwitcher cameraMode;
     public DebugHUD hud;
 
     void Start() {
@@ -39,6 +40,7 @@ public sealed class DemoController : MonoBehaviour {
         states.ResetMachine();
         if (animatorBridge) animatorBridge.ResetAnimation();
         if (cameraInput) cameraInput.ResetView();
+        if (cameraMode) cameraMode.ResetMode();
         foreach (var h in FindObjectsByType<Health>(FindObjectsSortMode.None)) h.Restore(); // training dummy
     }
 

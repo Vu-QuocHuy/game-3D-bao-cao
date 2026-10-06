@@ -4,7 +4,7 @@ Ngày kiểm: 05/10/2026 · Unity 6000.3.23f1 · build Linux `Builds/TrainingAre
 
 ## 1. Kết luận
 
-**Phần dựng project và chức năng: đáp ứng đủ.** Mọi mục bắt buộc ở mục 3–9 và toàn bộ checklist "Kiểm tra chức năng" ở mục 11 đã được kiểm bằng chạy thật: **71/71 mục đạt**, chạy hai lần liên tiếp cho cùng kết quả (`Verification.json`, ảnh trong `VerifyShots/`).
+**Phần dựng project và chức năng: đáp ứng đủ.** Mọi mục bắt buộc ở mục 3–9 và toàn bộ checklist "Kiểm tra chức năng" ở mục 11 đã được kiểm bằng chạy thật: **79/79 mục đạt** (71 mục đã đạt hai lần liên tiếp trước khi thêm góc rộng; 8 mục góc rộng chạy một lần) (`Verification.json`, ảnh trong `VerifyShots/`).
 
 **Chưa hoàn thành (không thuộc phạm vi code, hoặc cần người làm tay):**
 
@@ -152,11 +152,12 @@ Các bước Thứ Ba và Thứ Năm đều có điểm trong scene và đã ki�
 | Capsule Rigidbody so sánh | Chưa làm |
 | Build APK | Chưa làm |
 
-## 3. Phần thêm ngoài đặc tả (theo yêu cầu: giữ Crouch và Attack)
+## 3. Phần thêm ngoài đặc tả (theo yêu cầu: giữ Crouch, Attack và góc rộng)
 
 | Tính năng | Hành vi | Kiểm |
 |---|---|---|
 | Crouch (phím **C**; Ctrl dành cho Walk) | Khom 1,6 m/s, cấm nhảy; dưới thanh chắn thả C vẫn giữ thấp; camera hạ theo, không kẹt trong thanh | 9 mục |
+| Góc rộng (phím **V**, khôi phục từ bản trước) | Đổi third person ↔ camera cao 10 m phía sau, nghiêng 45°, có blend 0,5 s; không đổi vị trí nhân vật; R về third person; HUD dòng `Camera:` | 8 mục |
 | Attack (chuột trái) | Event mở/đóng hitbox; 0,85 s, cooldown 1 s, −25 HP dummy; giữ chuột chỉ đánh một lần; đi được khi đánh; chặn trên không | 8 mục |
 
 Hai tính năng không ảnh hưởng 4 state gốc: Idle/Move/Jump/Fall giữ nguyên điều kiện chuyển ở mục 6.2.

@@ -9,6 +9,7 @@
 | Input Actions `Input/PlayerControls` | Move (WASD, Left Stick), Look (Mouse Delta, Right Stick), Jump (Space, Button South), Walk (Left Ctrl), ToggleWorldMove (T), Crouch (C), Attack (Left Mouse) |
 | UI cảm ứng | On-Screen Stick `<Gamepad>/leftStick` (góc dưới trái), On-Screen Button `<Gamepad>/buttonSouth` (góc dưới phải), vùng kéo On-Screen Stick `<Gamepad>/rightStick` (nửa phải), EventSystem + Input System UI Input Module |
 | Camera | CinemachineCamera, Tracking Target `Player/CameraTarget` (y 1,5; 0,95 khi khom); Orbital Follow Sphere, bán kính 4 m, damping 0,2; Rotation Composer damping 0,1; Deoccluder chỉ va layer Environment, Camera Radius 0,2, bỏ qua tag Player; pitch −20°..70° |
+| Góc rộng (mở rộng) | Action `ToggleCamera` (V). `CM Wide Angle`: không Follow/Body, `CameraModeSwitcher` đặt vị trí = người chơi + (0, 10, −12), xoay (45°, 0, 0) mỗi LateUpdate. Priority: third person 20 / wide 0, đảo khi bấm V; Brain blend 0,5 s |
 | Animator | Parameter `Speed` (0–1), `IsGrounded`, `Jump` (trigger); mở rộng `Crouch`, `Attack` (trigger). Locomotion → Jump (Jump), Jump → Fall (exit time 0,7), Locomotion → Fall (!IsGrounded), Fall → Locomotion (IsGrounded); Locomotion ↔ Crouch (Crouch). Layer Upper Body (mask thân trên) cho Attack, weight tăng khi đang đánh. Root Motion tắt |
 | Clip | Idle, Walk, Run, Fall, Crouch, CrouchWalk loop; Jump, Attack không loop. Event: Footstep (Walk/Run), OpenHitbox 0,16 s / CloseHitbox 0,65 s (Attack) |
 | Attack | 0,85 s, cooldown 1 s, −25 HP, tầm 1,1 m; dummy 100 HP, R hồi đầy |
